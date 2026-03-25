@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Lehrerhandbuch — Operation Schild</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;500;600;700&family=Barlow+Condensed:wght@700&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{--bg:#0d1117;--s:#161b22;--c:#1e2330;--br:#21262d;--acc:#f0a500;--g:#3fb950;--r:#ff4444;--b:#58a6ff;--t:#e6edf3;--m:#8b949e;}
+body{background:var(--bg);color:var(--t);font-family:'Inter',sans-serif;font-size:15px;line-height:1.7;}
+.warn{background:var(--acc);color:#000;text-align:center;padding:8px;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:1px;}
+header{background:var(--s);border-bottom:1px solid var(--br);padding:40px 24px;text-align:center;}
+.sup{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--acc);letter-spacing:3px;margin-bottom:10px;}
+h1{font-family:'Barlow Condensed',sans-serif;font-size:clamp(40px,7vw,62px);font-weight:700;letter-spacing:2px;color:#fff;line-height:1;}
+.meta{color:var(--m);font-size:14px;margin-top:8px;}
+.pills{display:flex;gap:8px;justify-content:center;margin-top:16px;flex-wrap:wrap;}
+.pill{background:var(--br);border:1px solid #30363d;border-radius:20px;padding:5px 14px;font-size:12px;color:var(--m);}
+.pill strong{color:var(--t);}
+main{max-width:860px;margin:0 auto;padding:40px 24px;}
+section{margin-bottom:48px;}
+h2{font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:700;color:var(--acc);letter-spacing:1px;margin-bottom:18px;padding-left:14px;border-left:3px solid var(--acc);}
+h3{font-size:15px;font-weight:600;color:#cde;margin:16px 0 8px;}
+p{color:var(--m);margin-bottom:10px;font-size:14px;}
+.story{background:var(--s);border:1px solid var(--br);border-left:3px solid var(--acc);border-radius:8px;padding:20px 22px;font-style:italic;color:#bcc;line-height:1.9;font-size:14px;}
+.tl{display:flex;gap:18px;padding:14px 0;border-bottom:1px solid var(--br);}
+.tlt{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--acc);min-width:70px;padding-top:2px;}
+.tlc strong{color:var(--t);display:block;font-size:14px;margin-bottom:2px;}
+.tlc span{font-size:13px;color:var(--m);}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.sc{background:var(--s);border:1px solid var(--br);border-top:3px solid;border-radius:10px;padding:18px;}
+.sn{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--m);margin-bottom:4px;}
+.st{font-size:14px;font-weight:600;color:var(--t);margin-bottom:4px;}
+.sd{font-size:12px;color:var(--m);line-height:1.6;margin-bottom:10px;}
+.cb{display:inline-block;background:var(--bg);border:1px solid var(--br);border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--g);padding:2px 8px;}
+.sol{background:#001a00;border:1px solid #003300;border-radius:8px;padding:14px;margin-bottom:10px;}
+.sol strong{color:var(--g);display:block;font-size:13px;margin-bottom:5px;}
+.sol p{color:#3a7a3a;font-size:12px;font-family:'JetBrains Mono',monospace;line-height:1.9;margin:0;}
+table.ct{width:100%;border-collapse:collapse;font-size:13px;}
+table.ct th{background:var(--s);color:var(--m);padding:9px 12px;text-align:left;border-bottom:1px solid var(--br);font-weight:400;font-family:'JetBrains Mono',monospace;font-size:10px;}
+table.ct td{padding:9px 12px;border-bottom:1px solid rgba(33,38,45,.6);}
+table.ct td:first-child{font-family:'JetBrains Mono',monospace;color:var(--g);}
+.fcode{font-family:'JetBrains Mono',monospace;font-size:18px;color:var(--g);text-align:center;border:1.5px dashed var(--g);border-radius:8px;padding:18px;letter-spacing:4px;margin:16px 0;}
+.tip{background:var(--s);border:1px solid var(--br);border-radius:8px;padding:14px 16px;margin-bottom:10px;}
+.tip strong{color:var(--b);display:block;margin-bottom:4px;font-size:13px;}
+.tip p{font-size:13px;margin:0;}
+.alert{background:#1a0a00;border:1px solid #553300;border-radius:8px;padding:12px 16px;font-size:13px;color:#cc7733;margin-bottom:12px;}
+footer{text-align:center;padding:28px;color:var(--m);font-family:'JetBrains Mono',monospace;font-size:11px;border-top:1px solid var(--br);}
+@media(max-width:600px){.grid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="warn">⚠ LEHRERHANDBUCH — NICHT AN SCHÜLERINNEN UND SCHÜLER WEITERGEBEN ⚠</div>
+<header>
+  <div class="sup">OPERATION SCHILD v3.0 // MS DIGITBURG // HARD MODE // DEUTSCH</div>
+  <h1>LEHRERHANDBUCH</h1>
+  <div class="meta">Cybersicherheits-Escape-Game · 8./9. Schulstufe · Lehrerin: Fr. Kugl · MS2 Schwaz</div>
+  <div class="pills">
+    <div class="pill">⏱ <strong>60 min</strong></div>
+    <div class="pill">👥 <strong>4–6 Gruppen</strong></div>
+    <div class="pill">📱 <strong>Tablets / Smartphones</strong></div>
+    <div class="pill">🇦🇹 <strong>Deutsch</strong></div>
+    <div class="pill">💡 <strong>Hinweise vorhanden</strong></div>
+    <div class="pill">🧠 <strong>Anspruchsvoll</strong></div>
+  </div>
+</header>
+<main>
+
+<section>
+<h2>Geschichte</h2>
+<div class="story">„Es ist Montag früh. Alle Bildschirme in der Schule flackern gleichzeitig auf.
+Eine verzerrte Stimme ertönt über die Gegensprechanlage:<br><br>
+<em>‚Ich bin G4TEWAY. Ich habe euren Schulserver übernommen. Eure Noten — verschlüsselt.
+Eure Daten — in meiner Hand. Sechs Terminals sind noch aktiv.
+Jede Gruppe hat einen anderen Schlüssel zu meinem System.
+Findet alle sechs Teilcodes, kombiniert sie und führt den Shutdown-Befehl aus.
+Ihr habt 60 Minuten. Ich beobachte euch.'</em><br><br>
+Keine Hilfe wird gegeben. Kein Lehrer darf eingreifen. Ihr seid auf euch gestellt."</div>
+</section>
+
+<section>
+<h2>Ablaufplan</h2>
+<div class="tl"><div class="tlt">00:00</div><div class="tlc"><strong>Intro</strong><span>Kurze Einführung (Geschichte, Regeln, Tablets verteilen), optional: verzerrtes Audio abspielen</span></div></div>
+<div class="tl"><div class="tlt">00:05</div><div class="tlc"><strong>Start</strong><span>Alle Gruppen starten gleichzeitig, jede an ihrem zugewiesenen Terminal</span></div></div>
+<div class="tl"><div class="tlt">05–45</div><div class="tlc"><strong>Hauptspiel</strong><span>Gruppen lösen 3-phasige Aufgaben. Jede Station hat einen Hinweis-Button — die Schüler entscheiden selbst, wann sie ihn nutzen. Rotation nach ca. 13 Min. möglich.</span></div></div>
+<div class="tl"><div class="tlt">00:45</div><div class="tlc"><strong>Final-Terminal</strong><span>Alle Gruppen kommen zusammen, tauschen ihre Codes aus und geben sie gemeinsam am Final-Terminal ein</span></div></div>
+<div class="tl"><div class="tlt">45–60</div><div class="tlc"><strong>Reflexion</strong><span>Was haben wir gelernt? Welche Aufgaben waren am schwierigsten? Was hat das mit unserem Alltag zu tun?</span></div></div>
+</section>
+
+<section>
+<h2>Die 6 Terminals</h2>
+<div class="grid">
+  <div class="sc" style="border-top-color:#ff5757;">
+    <div class="sn">TERMINAL 01</div><div class="st">📨 E-Mail-Forensik</div>
+    <div class="sd">Phase 1: Echte Absender-Domain aus Rohkopfzeilen finden (Return-Path/Reply-To). Phase 2: Phishing-URL zerlegen, echte Domain identifizieren. Phase 3: Caesar-Verschlüsselung (ROT13, Shift 13) mit interaktivem Decoder knacken.</div>
+    <div class="cb">PHANTOM</div>
+  </div>
+  <div class="sc" style="border-top-color:#ffb347;">
+    <div class="sn">TERMINAL 02</div><div class="st">🌐 Kompromittierte Website</div>
+    <div class="sd">Phase 1: Alle Tabs inkl. Quellcode-Tab durchsuchen, E-Mail-Adresse + Betreff PROTOKOLL-7 finden. Phase 2: E-Mail senden → Auto-Antwort enthält Code. Phase 3: Warum hinterlassen Angreifer Falle-Codes?</div>
+    <div class="cb">SPECTER</div>
+  </div>
+  <div class="sc" style="border-top-color:#a78bfa;">
+    <div class="sn">TERMINAL 03</div><div class="st">01 Passwörter & Binär</div>
+    <div class="sd">Phase 1: 5 Binärwerte in ASCII umrechnen (Ergebnis: KRYPT). Phase 2: Das eine unknackbare Passwort aus 5 Optionen identifizieren. Phase 3: Passwort erstellen, das alle 5 Sicherheitskriterien erfüllt (Live-Prüfer).</div>
+    <div class="cb">CIPHER</div>
+  </div>
+  <div class="sc" style="border-top-color:#3ddc84;">
+    <div class="sn">TERMINAL 04</div><div class="st">👤 Datenschutz & Daten</div>
+    <div class="sd">Phase 1: OSINT-Profil aus 4 Quellen analysieren, gefährliche Datenkombination erkennen. Phase 2: Die 4 Daten auswählen, die nie öffentlich geteilt werden sollten. Phase 3: Morse-Signal entschlüsseln (-. . -..- ..- ... = NEXUS).</div>
+    <div class="cb">NEXUS</div>
+  </div>
+  <div class="sc" style="border-top-color:#4f9eff;">
+    <div class="sn">TERMINAL 05</div><div class="st">📡 Netzwerksicherheit</div>
+    <div class="sd">Phase 1: Hex-IP B9.DC.65.2F in Dezimal umrechnen (185.220.101.47). Phase 2: Echtes Schulnetzwerk vs. Evil Twin anhand MAC-Präfix, IP-Bereich und WPA3 identifizieren. Phase 3: ASCII-Hex-Nutzlast (56 45 4e 4f 4d = VENOM) lesen.</div>
+    <div class="cb">VENOM</div>
+  </div>
+  <div class="sc" style="border-top-color:#ff5757;">
+    <div class="sn">TERMINAL 06</div><div class="st">🦠 Malware & Dateien</div>
+    <div class="sd">Phase 1: 2 Dateien mit abweichenden SHA-256-Hashes finden. Phase 2: 4 Malware-Verhaltensweisen den richtigen Typen zuordnen (Ransomware/Trojaner/Wurm/Keylogger). Phase 3: LSB-Steganographie — 8 Pixel-LSBs → 01010010 → R → BRE+R+CH.</div>
+    <div class="cb">BREACH</div>
+  </div>
+</div>
+</section>
+
+<section>
+<h2>Detaillierte Lösungen</h2>
+<div class="sol"><strong>Terminal 01 — Caesar-Verschlüsselung (ROT13)</strong><p>Verschlüsselt: CUNAGBZ · Verschiebung 13 · Entschlüsselt: PHANTOM<br>A↔N B↔O C↔P D↔Q E↔R F↔S G↔T H↔U I↔V J↔W K↔X L↔Y M↔Z</p></div>
+<div class="sol"><strong>Terminal 02 — E-Mail-Autoresponder einrichten</strong><p>Gmail (oder ähnlich) für <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="1977766d7f78757559746a347d707e706d7b6c6b7e37786d">[email&#160;protected]</a> einrichten.<br>Filter: Betreff enthält „PROTOKOLL-7" → Auto-Antwort:<br>„SYSTEM: Protokoll-7 bestätigt. Dein Teilcode: SPECTER. Weiter zu Terminal 03."</p></div>
+<div class="sol"><strong>Terminal 03 — Binär zu ASCII</strong><p>01001011=75=K · 01010010=82=R · 01011001=89=Y · 01010000=80=P · 01010100=84=T → KRYPT<br>Unknackbares Passwort: kV#9mL$2pQr! (98-Bit-Entropie, vollständig zufällig)</p></div>
+<div class="sol"><strong>Terminal 04 — Morse-Code</strong><p>-·=N · ·=E · -··-=X · ··-=U · ···=S → NEXUS<br>/ (Wortgrenze) · -··=D · ·-=A · -=T · ·-=A → DATEN<br>Vollständige Nachricht: NEXUS DATEN · Akzeptierte Antwort: NEXUS</p></div>
+<div class="sol"><strong>Terminal 05 — Hex-IP + ASCII-Nutzlast</strong><p>B9=185 · DC=220 · 65=101 · 2F=47 → 185.220.101.47<br>56=86=V · 45=69=E · 4E=78=N · 4F=79=O · 4D=77=M → VENOM</p></div>
+<div class="sol"><strong>Terminal 06 — LSB-Steganographie</strong><p>Pixel-Rot-Werte: 200,201,200,200,200,200,200,201<br>LSBs: 0,1,0,0,0,0,0,1 = 01000001 = 65 = 'A'<br>Formel: BRE + A + CH = BREACH</p></div>
+</section>
+
+<section>
+<h2>Alle Codes auf einen Blick</h2>
+<table class="ct">
+<thead><tr><th>CODE</th><th>TERMINAL</th><th>KERNKONZEPT</th><th>WIE ERHALTEN</th></tr></thead>
+<tbody>
+<tr><td>PHANTOM</td><td>01 — E-Mail-Forensik</td><td>Phishing / Caesar</td><td>CUNAGBZ mit Shift 13 entschlüsseln</td></tr>
+<tr><td>SPECTER</td><td>02 — Website</td><td>Quellcode-Analyse</td><td>E-Mail PROTOKOLL-7 → Auto-Antwort</td></tr>
+<tr><td>CIPHER</td><td>03 — Passwörter</td><td>Binär / Entropie</td><td>Passwort mit allen Kriterien erstellen</td></tr>
+<tr><td>NEXUS</td><td>04 — Datenschutz</td><td>OSINT / Morse-Code</td><td>Morse-Signal entschlüsseln</td></tr>
+<tr><td>VENOM</td><td>05 — Netzwerk</td><td>Hex / Evil Twin / ASCII</td><td>Hex-Nutzlast 56 45 4E 4F 4D lesen</td></tr>
+<tr><td>BREACH</td><td>06 — Malware</td><td>Hash / Steganographie</td><td>LSB-Pixel → R → BRE+R+CH</td></tr>
+</tbody>
+</table>
+<div class="fcode">PHANTOM · SPECTER · CIPHER · NEXUS · VENOM · BREACH</div>
+</section>
+
+<section>
+<h2>Tipps für die Durchführung</h2>
+<div class="tip"><strong>👩‍🏫 Frau Kugl — Intro-Overlay</strong><p>Jede Station startet mit einem Fullscreen-Intro: Frau Kugl erklärt kurz das Thema, dann flackert der Bildschirm und G4TEWAY „übernimmt". Die Schülerinnen und Schüler klicken selbst auf „Aufgabe starten". Kein Eingriff nötig — einfach das Tablet hinlegen.</p></div>
+<div class="tip"><strong>📧 Terminal 02 — E-Mail-Setup</strong><p>Gmail oder ähnlichen Dienst für <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="402e2f3426212c2c002d336d2429272934223532276e2134">[email&#160;protected]</a> einrichten. Filter erstellen: Wenn Betreff „PROTOKOLL-7" enthält → Auto-Antwort mit Code SPECTER senden. Vor der Stunde testen! Falls das Setup scheitert: Gruppe kann den Code direkt mitgeteilt bekommen, nachdem sie Adresse und Betreff korrekt identifiziert hat.</p></div>
+<div class="tip"><strong>💡 Das Hinweis-System</strong><p>Jede Phase hat einen Hinweis-Button. Die Schülerinnen und Schüler entscheiden selbst, wann sie ihn nutzen — das erhält die Herausforderung und verhindert gleichzeitig totale Frustration. Die Hinweise führen ohne die Antwort direkt zu verraten.</p></div>
+<div class="tip"><strong>⏰ Zeitplanung</strong><p>Jede Station dauert ca. 10–18 Minuten. Terminal 06 (Steganographie) ist erfahrungsgemäß am schwierigsten. Wenn Gruppen nach 15 Minuten in einer Phase feststecken, kann die Lehrkraft einen kleinen mündlichen Hinweis geben.</p></div>
+<div class="tip"><strong>🔄 Rotation</strong><p>Optional: Gruppen rotieren nach ca. 13 Minuten zur nächsten Station. So kann jede Gruppe alle Themen kennenlernen — allerdings werden dann nicht alle Gruppen alle 6 Codes selbst erarbeiten. Für die Finale müssen alle Codes zusammengetragen werden.</p></div>
+<div class="alert">⚠ <strong>Terminal 03 Hinweis:</strong> Der Live-Passwort-Stärke-Checker funktioniert vollständig im Browser — keine externen Tools nötig. Die Schülerinnen

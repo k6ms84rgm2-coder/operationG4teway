@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>FINAL-TERMINAL — G4TEWAY Abschalten | MS2 Schwaz</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Barlow+Condensed:wght@700&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#060a0f;color:#e8eaf0;font-family:'JetBrains Mono',monospace;min-height:100vh;overflow:hidden;}
+canvas{position:fixed;inset:0;z-index:0;pointer-events:none;}
+
+/* ── KUGL INTRO ─────────────────────────────────────────────── */
+#kugl-intro{
+  position:fixed;inset:0;z-index:999;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:linear-gradient(160deg,#0b1929,#040c18);padding:32px 24px;
+}
+.ki-logo{font-family:'JetBrains Mono',monospace;font-size:11px;color:#4f9eff;
+  letter-spacing:3px;margin-bottom:24px;opacity:.7;}
+.ki-avatar{width:90px;height:90px;border-radius:50%;background:linear-gradient(135deg,#1a3560,#0d2040);
+  border:3px solid #4f9eff55;display:flex;align-items:center;justify-content:center;
+  font-size:40px;margin-bottom:14px;box-shadow:0 0 40px #4f9eff18;}
+.ki-name{font-family:'JetBrains Mono',monospace;font-size:13px;color:#4f9eff;
+  letter-spacing:2px;margin-bottom:3px;font-weight:700;}
+.ki-role{font-size:12px;color:#2a4a6a;margin-bottom:26px;}
+.ki-bubble{background:#0e1e35;border:1px solid #1a3558;border-radius:14px;
+  border-top-left-radius:4px;padding:18px 22px;max-width:540px;
+  font-size:14px;color:#c8ddf0;line-height:1.9;margin-bottom:26px;
+  position:relative;text-align:left;}
+.ki-bubble::before{content:'';position:absolute;top:-1px;left:-1px;
+  width:14px;height:14px;background:#0e1e35;border-left:1px solid #1a3558;
+  border-top:1px solid #1a3558;border-radius:0 0 8px 0;}
+.ki-btn{background:#4f9eff;border:none;border-radius:10px;padding:13px 34px;
+  color:#fff;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;
+  cursor:pointer;letter-spacing:1px;transition:all .2s;}
+.ki-btn:hover{background:#3d8ef0;transform:translateY(-1px);}
+
+/* ── MAIN UI ────────────────────────────────────────────────── */
+.wrap{position:relative;z-index:1;min-height:100vh;
+  display:flex;align-items:center;justify-content:center;padding:20px;}
+.inner{width:100%;max-width:680px;}
+#main-ui{display:none;}
+.blink{font-size:11px;color:#ff5757;letter-spacing:3px;text-align:center;
+  animation:bl .9s step-end infinite;margin-bottom:14px;}
+@keyframes bl{0%,100%{opacity:1}50%{opacity:0}}
+.big{font-family:'Barlow Condensed',sans-serif;font-size:clamp(38px,8vw,68px);
+  font-weight:700;text-align:center;letter-spacing:3px;line-height:1.05;margin-bottom:5px;}
+.big .g4{color:#ff5757;}
+.sub{text-align:center;font-size:11px;color:#2a3a5a;letter-spacing:2px;margin-bottom:6px;}
+.school-line{text-align:center;font-size:11px;color:#3a5a7a;letter-spacing:1px;margin-bottom:20px;}
+.chips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:18px;}
+.chip{background:#0f1320;border:1px solid #1e2840;border-radius:6px;
+  padding:5px 11px;font-size:10px;letter-spacing:1px;color:#2a3a5a;transition:all .4s;}
+.chip.lit{border-color:#4f9eff;color:#4f9eff;background:#4f9eff0a;}
+.grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px;}
+.ibox{background:#0d1020;border:1px solid #1e2840;border-radius:8px;
+  padding:10px;text-align:center;transition:border-color .4s;}
+.ibox label{display:block;font-size:9px;color:#2a3a5a;letter-spacing:1px;margin-bottom:6px;}
+.ibox input{background:transparent;border:none;color:#4f9eff;
+  font-family:'JetBrains Mono',monospace;font-size:13px;
+  text-align:center;width:100%;outline:none;letter-spacing:1px;}
+.ibox.ok{border-color:#3ddc84;background:#3ddc8408;}
+.ibox.ok input{color:#3ddc84;}
+.ibox.err{border-color:#ff5757;animation:sk .3s;}
+@keyframes sk{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+.divider{text-align:center;font-size:11px;color:#1e2840;margin:10px 0;letter-spacing:2px;}
+.seqin{width:100%;background:#0d1020;border:1px solid #1e2840;border-radius:8px;
+  padding:12px 16px;color:#4f9eff;font-family:'JetBrains Mono',monospace;font-size:13px;
+  text-align:center;outline:none;letter-spacing:2px;margin-bottom:12px;transition:border-color .2s;}
+.seqin:focus{border-color:#4f9eff;}
+.shutbtn{width:100%;background:transparent;border:2px solid #ff5757;border-radius:10px;
+  padding:14px;color:#ff5757;font-family:'JetBrains Mono',monospace;font-size:14px;
+  font-weight:700;cursor:pointer;letter-spacing:2px;transition:all .2s;}
+.shutbtn:hover{background:#ff5757;color:#000;}
+.errmsg{text-align:center;color:#ff5757;font-size:11px;margin-top:8px;min-height:18px;}
+#success{display:none;text-align:center;animation:ap .8s ease;}
+@keyframes ap{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:scale(1)}}
+.bigcheck{font-size:64px;display:block;margin-bottom:10px;}
+.suctitle{font-family:'Barlow Condensed',sans-serif;
+  font-size:clamp(32px,7vw,58px);font-weight:700;color:#3ddc84;
+  letter-spacing:4px;margin-bottom:8px;}
+.suc-codes{font-family:'JetBrains Mono',monospace;font-size:13px;color:#3ddc84;
+  background:#3ddc8408;border:1px solid #3ddc8430;border-radius:8px;
+  padding:12px 20px;display:inline-block;margin:10px 0;letter-spacing:2px;}
+.tags{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:12px 0;}
+.stag{background:#001a00;border:1px solid #3ddc8440;border-radius:20px;
+  padding:4px 12px;font-size:11px;color:#3ddc84;}
+.suc-school{font-size:12px;color:#1a4a2a;margin-top:14px;letter-spacing:1px;}
+</style>
+</head>
+<body>
+
+<!-- FRAU KUGL INTRO -->
+<div id="kugl-intro">
+  <div class="ki-logo">MS2 SCHWAZ // OPERATION SCHILD // FINAL-TERMINAL</div>
+  <div class="ki-avatar">👩‍🏫</div>
+  <div class="ki-name">FRAU KUGL</div>
+  <div class="ki-role">Lehrerin · MS2 Schwaz</div>
+  <div class="ki-bubble">
+    Fantastisch — ihr habt alle 6 Terminals gelöst! 🎉<br><br>
+    Jetzt kommt der entscheidende Moment: Ihr habt zusammen
+    <strong>6 Teilcodes</strong> gesammelt — einen pro Station.
+    Gebt sie hier alle ein und führt gemeinsam den <strong>Shutdown</strong> aus,
+    um G4TEWAY endgültig aus dem Netzwerk der MS2 Schwaz zu entfernen.<br><br>
+    Ihr könnt jeden Code einzeln in sein Feld eingeben
+    — oder alle auf einmal als Sequenz.<br><br>
+    <strong style="color:#6fb8ff;">Bereit? Dann schaltet G4TEWAY ab! ⚡</strong>
+  </div>
+  <button class="ki-btn" onclick="showMain()">⚡ Zum Shutdown-Terminal</button>
+</div>
+
+<canvas id="cv"></canvas>
+<div class="wrap"><div class="inner">
+<div id="main-ui">
+  <div class="blink">⚠ BEDROHUNGSSTUFE: KRITISCH — G4TEWAY AKTIV ⚠</div>
+  <div class="big"><span class="g4">G4TEWAY</span><br>ABSCHALTEN</div>
+  <div class="sub">ALLE 6 TEILCODES EINGEBEN</div>
+  <div class="school-line">MS2 Schwaz · Frau Kugl · Operation Schild</div>
+  <div class="chips">
+    <div class="chip" id="ch0">TERMINAL_01</div>
+    <div class="chip" id="ch1">TERMINAL_02</div>
+    <div class="chip" id="ch2">TERMINAL_03</div>
+    <div class="chip" id="ch3">TERMINAL_04</div>
+    <div class="chip" id="ch4">TERMINAL_05</div>
+    <div class="chip" id="ch5">TERMINAL_06</div>
+  </div>
+  <div class="grid">
+    <div class="ibox" id="ib0"><label>TERMINAL 01</label><input id="i0" maxlength="8" placeholder="???????" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" oninput="this.value=this.value.toUpperCase();live(0)"></div>
+    <div class="ibox" id="ib1"><label>TERMINAL 02</label><input id="i1" maxlength="8" placeholder="???????" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" oninput="this.value=this.value.toUpperCase();live(1)"></div>
+    <div class="ibox" id="ib2"><label>TERMINAL 03</label><input id="i2" maxlength="6" placeholder="??????" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" oninput="this.value=this.value.toUpperCase();live(2)"></div>
+    <div class="ibox" id="ib3"><label>TERMINAL 04</label><input id="i3" maxlength="5" placeholder="?????" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" oninput="this.value=this.value.toUpperCase();live(3)"></div>
+    <div class="ibox" id="ib4"><label>TERMINAL 05</label><input id="i4" maxlength="5" placeholder="?????" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" oninput="this.value=this.value.toUpperCase();live(4)"></div>
+    <div class="ibox" id="ib5"><label>TERMINAL 06</label><input id="i5" maxlength="6" placeholder="??????" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" oninput="this.value=this.value.toUpperCase();live(5)"></div>
+  </div>
+  <div class="divider">— ODER ALLE ALS SEQUENZ —</div>
+  <input class="seqin" id="seq" placeholder="CODE1 CODE2 CODE3 CODE4 CODE5 CODE6" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" oninput="this.value=this.value.toUpperCase()">
+  <button class="shutbtn" onclick="doShutdown()">⚡ SHUTDOWN AUSFÜHREN</button>
+  <div class="errmsg" id="errmsg"></div>
+</div>
+
+<div id="success">
+  <span class="bigcheck">🎉</span>
+  <div class="suctitle">SHUTDOWN ERFOLGREICH!</div>
+  <div style="font-size:13px;color:#88ffcc;margin-bottom:8px;">G4TEWAY wurde aus dem Netzwerk der MS2 Schwaz entfernt.</div>
+  <div class="suc-codes">PHANTOM · SPECTER · CIPHER · NEXUS · VENOM · BREACH</div>
+  <div class="tags">
+    <div class="stag">✓ Phishing-Analyse</div>
+    <div class="stag">✓ URL-Zerlegung</div>
+    <div class="stag">✓ Caesar-Verschlüsselung</div>
+    <div class="stag">✓ Binär / ASCII</div>
+    <div class="stag">✓ Passwort-Sicherheit</div>
+    <div class="stag">✓ OSINT-Profiling</div>
+    <div class="stag">✓ Morse-Code</div>
+    <div class="stag">✓ Hex-Umrechnung</div>
+    <div class="stag">✓ Evil-Twin-WLAN</div>
+    <div class="stag">✓ Hash-Prüfung</div>
+    <div class="stag">✓ Malware-Typen</div>
+    <div class="stag">✓ Steganographie</div>
+  </div>
+  <div class="suc-school">MS2 Schwaz · Frau Kugl · Operation Schild — Mission erfüllt!</div>
+</div>
+
+</div></div>
+
+<script>
+var CODES=['PHANTOM','SPECTER','CIPHER','NEXUS','VENOM','BREACH'];
+var matColor='#ff2200';
+var cv=document.getElementById('cv'),ctx=cv.getContext('2d');
+
+function rsz(){cv.width=window.innerWidth;cv.height=window.innerHeight;}
+rsz();window.addEventListener('resize',rsz);
+
+var chars='01G4TEWAYMS2SCHWAZPHANTOMSPECTERNEXUSVENOMSB';
+var drops=[];
+function initDrops(){drops=[];for(var i=0;i<Math.floor(cv.width/16);i++)drops.push(Math.random()*50);}
+initDrops();window.addEventListener('resize',initDrops);
+
+function drawM(){
+  ctx.fillStyle='rgba(0,0,0,.07)';ctx.fillRect(0,0,cv.width,cv.height);
+  ctx.fillStyle=matColor;ctx.font='12px monospace';
+  drops.forEach(function(y,i){
+    ctx.fillText(chars[Math.floor(Math.random()*chars.length)],i*16,y*16);
+    if(y*16>cv.height&&Math.random()>.97)drops[i]=0;
+    drops[i]++;
+  });
+}
+setInterval(drawM,60);
+
+function showMain(){
+  document.getElementById('kugl-intro').style.transition='opacity .5s';
+  document.getElementById('kugl-intro').style.opacity='0';
+  setTimeout(function(){
+    document.getElementById('kugl-intro').style.display='none';
+    document.getElementById('main-ui').style.display='block';
+  },520);
+}
+
+function live(n){
+  var v=document.getElementById('i'+n).value;
+  if(v===CODES[n]){
+    document.getElementById('ib'+n).className='ibox ok';
+    document.getElementById('ch'+n).className='chip lit';
+    document.getElementById('ch'+n).textContent=CODES[n];
+  } else {
+    document.getElementById('ib'+n).className='ibox';
+  }
+}
+
+function doShutdown(){
+  var boxOk=CODES.every(function(c,i){return document.getElementById('i'+i).value===c;});
+  var seq=document.getElementById('seq').value.trim();
+  var seqOk=CODES.every(function(c){return seq.includes(c);});
+  if(boxOk||seqOk){
+    document.getElementById('main-ui').style.display='none';
+    document.getElementById('success').style.display='block';
+    matColor='#00cc44';
+  } else {
+    var wrong=CODES.filter(function(c,i){return document.getElementById('i'+i).value!==c;}).length;
+    document.getElementById('errmsg').textContent=wrong+' Code(s) fehlen oder falsch. Prüfe deine Notizen.';
+    CODES.forEach(function(c,i){
+      var inp=document.getElementById('i'+i);
+      if(inp.value&&inp.value!==c){
+        document.getElementById('ib'+i).className='ibox err';
+        setTimeout((function(idx){return function(){document.getElementById('ib'+idx).className='ibox';};})(i),500);
+      }
+    });
+  }
+}
+</script>
+</body>
+</html>
