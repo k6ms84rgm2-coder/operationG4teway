@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>TERMINAL 02 &mdash; Kompromittierte Website | MS2 Schwaz</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;500;600;700&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#0f1117;--surf:#171b26;--card:#1e2333;
+  --brd:#252e42;--brd2:#3a4560;
+  --acc:#4f9eff;--grn:#3ddc84;--red:#ff5757;--amb:#ffb347;--pur:#a78bfa;
+  --txt:#e8eaf0;--mut:#6b7a9a;
+}
+body{background:var(--bg);color:var(--txt);font-family:'Inter',sans-serif;
+  font-size:15px;line-height:1.65;min-height:100vh;}
+
+/* Topbar */
+.topbar{background:var(--surf);border-bottom:1px solid var(--brd);
+  padding:12px 20px;display:flex;align-items:center;
+  justify-content:space-between;flex-wrap:wrap;gap:10px;}
+.badge{border-radius:6px;padding:5px 12px;font-family:'JetBrains Mono',monospace;
+  font-size:11px;letter-spacing:1px;font-weight:700;}
+.title{font-weight:700;font-size:16px;}
+.status{display:flex;align-items:center;gap:7px;
+  font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--red);}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--red);
+  animation:pu 1.4s ease-in-out infinite;}
+@keyframes pu{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* Progress */
+.prog{padding:13px 20px;background:var(--surf);border-bottom:1px solid var(--brd);}
+.steps{display:flex;align-items:center;}
+.sw{display:flex;align-items:center;gap:7px;}
+.sc{width:26px;height:26px;border-radius:50%;border:2px solid var(--brd2);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;
+  color:var(--mut);flex-shrink:0;transition:all .4s;}
+.sc.active{border-color:var(--acc);color:var(--acc);background:#4f9eff10;}
+.sc.done{border-color:var(--grn);background:var(--grn);color:#000;}
+.sl{font-size:12px;color:var(--mut);transition:color .4s;white-space:nowrap;}
+.sl.active{color:var(--txt);}
+.sline{flex:1;height:2px;background:var(--brd);border-radius:1px;
+  min-width:20px;margin:0 8px;transition:background .4s;}
+.sline.done{background:var(--grn);}
+
+/* Main */
+main{max-width:740px;margin:0 auto;padding:24px 20px;}
+.phase{display:none;}.phase.active{display:block;animation:fi .3s ease;}
+@keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* Card */
+.card{background:var(--card);border:1px solid var(--brd);
+  border-radius:12px;overflow:hidden;margin-bottom:16px;}
+.ch{padding:14px 18px;border-bottom:1px solid var(--brd);
+  display:flex;align-items:center;gap:10px;}
+.ci{width:34px;height:34px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;}
+.ch h2{font-size:14px;font-weight:600;}
+.ch p{font-size:12px;color:var(--mut);margin-top:2px;}
+.cb{padding:18px;}
+
+/* Mission box */
+.mission{background:#4f9eff0d;border:1px solid #4f9eff25;border-radius:10px;
+  padding:14px 16px;margin-bottom:16px;font-size:13px;color:#a8c4e8;line-height:1.75;}
+.ml{color:var(--acc);display:block;margin-bottom:5px;font-size:10px;
+  letter-spacing:1.5px;text-transform:uppercase;
+  font-family:'JetBrains Mono',monospace;font-weight:700;}
+
+/* Inputs */
+.ig{margin-top:14px;}
+.il{font-size:12px;color:var(--mut);font-family:'JetBrains Mono',monospace;
+  margin-bottom:7px;display:block;}
+.ir{display:flex;gap:8px;}
+.ti{background:var(--bg);border:1.5px solid var(--brd2);border-radius:8px;
+  padding:10px 14px;color:var(--txt);font-family:'JetBrains Mono',monospace;
+  font-size:13px;flex:1;outline:none;transition:border-color .2s;min-width:0;}
+.ti:focus{border-color:var(--acc);}
+.ti.ok{border-color:var(--grn);background:#3ddc8406;}
+.ti.err{border-color:var(--red);animation:sk .3s;}
+@keyframes sk{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.btn{background:var(--acc);border:none;border-radius:8px;padding:10px 20px;
+  color:#fff;font-family:'JetBrains Mono',monospace;font-size:12px;
+  font-weight:700;cursor:pointer;letter-spacing:.5px;
+  transition:background .15s;white-space:nowrap;}
+.btn:hover{background:#3d8ef0;}
+.btn-w{width:100%;margin-top:10px;padding:12px;}
+.fb{font-size:12px;margin-top:8px;min-height:18px;
+  font-family:'JetBrains Mono',monospace;}
+.fb.ok{color:var(--grn);}.fb.err{color:var(--red);}
+
+/* Hint */
+.hw{margin-top:12px;}
+.hbtn{background:none;border:1px solid var(--brd2);border-radius:8px;
+  padding:7px 13px;color:var(--mut);font-family:'JetBrains Mono',monospace;
+  font-size:11px;cursor:pointer;transition:all .2s;
+  display:inline-flex;align-items:center;gap:6px;}
+.hbtn:hover{border-color:var(--amb);color:var(--amb);}
+.hc{display:none;margin-top:8px;background:#ffb34710;
+  border:1px solid #ffb34730;border-radius:8px;padding:12px 14px;
+  font-size:12px;color:#c9a06a;line-height:1.75;}
+.hc.open{display:block;animation:fi .2s ease;}
+
+/* Reveal */
+.reveal{display:none;background:#3ddc840a;border:1.5px solid var(--grn);
+  border-radius:12px;padding:24px;text-align:center;margin-top:16px;}
+.reveal.show{display:block;animation:fi .5s ease;}
+.rl{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--grn);
+  letter-spacing:3px;margin-bottom:10px;opacity:.7;}
+.rc{font-family:'JetBrains Mono',monospace;font-size:44px;font-weight:700;
+  color:var(--grn);letter-spacing:8px;}
+.rn{font-size:12px;color:var(--mut);margin-top:8px;}
+
+/* Util */
+.mono{font-family:'JetBrains Mono',monospace;}
+.tag{display:inline-block;background:var(--brd);border-radius:4px;
+  padding:1px 6px;font-family:'JetBrains Mono',monospace;font-size:12px;}
+hr{border:none;border-top:1px solid var(--brd);margin:14px 0;}
+
+/* ══ INTRO OVERLAY ════════════════════════════════════════════════════ */
+#intro-overlay{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:#000;overflow:hidden;}
+#intro-kugl{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;background:linear-gradient(160deg,#0b1929 0%,#060e1c 100%);}
+.ik-logo{font-family:'JetBrains Mono',monospace;font-size:11px;color:#4f9eff;letter-spacing:3px;margin-bottom:24px;opacity:.7;}
+.ik-avatar{width:90px;height:90px;border-radius:50%;background:linear-gradient(135deg,#1a3560,#0d2040);border:3px solid #4f9eff55;display:flex;align-items:center;justify-content:center;font-size:40px;margin-bottom:14px;box-shadow:0 0 40px #4f9eff18;}
+.ik-name{font-family:'JetBrains Mono',monospace;font-size:13px;color:#4f9eff;letter-spacing:2px;margin-bottom:3px;font-weight:700;}
+.ik-role{font-size:12px;color:#2a4a6a;margin-bottom:26px;}
+.ik-bubble{background:#0e1e35;border:1px solid #1a3558;border-radius:14px;border-top-left-radius:4px;padding:18px 22px;max-width:520px;font-size:14px;color:#c8ddf0;line-height:1.85;margin-bottom:26px;position:relative;text-align:left;}
+.ik-bubble::before{content:'';position:absolute;top:-1px;left:-1px;width:14px;height:14px;background:#0e1e35;border-left:1px solid #1a3558;border-top:1px solid #1a3558;border-radius:0 0 8px 0;}
+.ik-startbtn{background:#4f9eff;border:none;border-radius:10px;padding:13px 34px;color:#fff;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:1px;transition:all .2s;}
+.ik-startbtn:hover{background:#3d8ef0;}
+#intro-hack{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;padding:24px;background:#000;overflow:hidden;}
+#hcv{position:absolute;inset:0;pointer-events:none;}
+.ih-inner{position:relative;z-index:2;text-align:center;animation:ghk .45s ease;}
+@keyframes ghk{0%{opacity:0;transform:skewX(-10deg) scale(1.05)}40%{opacity:1;transform:skewX(4deg)}70%{transform:skewX(-1deg)}100%{transform:skewX(0) scale(1)}}
+.ih-blink{font-family:'JetBrains Mono',monospace;font-size:11px;color:#ff5757;letter-spacing:4px;margin-bottom:12px;animation:ibl .85s step-end infinite;}
+@keyframes ibl{0%,100%{opacity:1}50%{opacity:0}}
+.ih-title{font-family:'JetBrains Mono',monospace;font-size:clamp(40px,8vw,68px);font-weight:700;color:#ff5757;letter-spacing:4px;line-height:1;margin-bottom:6px;text-shadow:0 0 40px #ff575766;}
+.ih-sub{font-family:'JetBrains Mono',monospace;font-size:12px;color:#aa3333;letter-spacing:2px;margin-bottom:22px;}
+.ih-msg{background:#120000;border:1px solid #ff575730;border-radius:10px;padding:16px 22px;max-width:520px;font-size:13px;color:#ff9999;line-height:1.85;margin-bottom:26px;font-family:'JetBrains Mono',monospace;text-align:left;}
+.ih-msg strong{color:#ff5757;display:block;font-size:10px;letter-spacing:2px;margin-bottom:8px;}
+.ih-btn{background:transparent;border:2px solid #ff5757;border-radius:10px;padding:13px 34px;color:#ff5757;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:1px;transition:all .2s;}
+.ih-btn:hover{background:#ff5757;color:#000;}
+.school-sub{font-family:'JetBrains Mono',monospace;font-size:10px;color:#2a4060;letter-spacing:1px;margin-top:3px;}
+.school-sub span{color:#4f9eff;}
+/* ══ END INTRO ════════════════════════════════════════════════════════ */
+
+.wtab{background:none;border:none;border-bottom:2px solid transparent;
+  padding:10px 14px;font-size:12px;font-family:'JetBrains Mono',monospace;
+  color:var(--mut);cursor:pointer;transition:all .2s;white-space:nowrap;}
+.wtab:hover{color:var(--txt);}
+.wtab.active{color:var(--acc);border-bottom-color:var(--acc);}
+.wtab.atab{color:var(--amb);}
+.wpage{font-size:13px;}
+.choice{background:var(--card);border:1.5px solid var(--brd);border-radius:10px;
+  padding:13px 15px;cursor:pointer;display:flex;align-items:flex-start;gap:12px;
+  font-size:13px;color:var(--mut);transition:all .2s;line-height:1.6;}
+.choice:hover{border-color:var(--acc);color:var(--txt);}
+.choice.correct{border-color:var(--grn);background:#3ddc8410;color:var(--grn);}
+.choice.wrong{border-color:var(--red);background:#ff575710;color:var(--red);}
+.cletter{width:24px;height:24px;border-radius:6px;background:var(--brd);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'JetBrains Mono',monospace;font-size:11px;
+  font-weight:700;flex-shrink:0;color:var(--txt);}
+</style>
+</head>
+<body>
+<div id="intro-overlay">
+  <div id="intro-kugl">
+    <div class="ik-logo">MS2 SCHWAZ // OPERATION SCHILD // TERMINAL 02</div>
+    <div class="ik-avatar">&#x1F469;&#x200D;&#x1F3EB;</div>
+    <div class="ik-name">FRAU KUGL</div>
+    <div class="ik-role">Lehrerin &middot; MS2 Schwaz</div>
+    <div class="ik-bubble">Hallo! Ich bin <strong>Frau Kugl</strong> von der MS2 Schwaz.<br><br>
+Heute schauen wir uns an, was passiert, wenn eine <strong>Website gehackt</strong> wird.
+Angreifer k&ouml;nnen Seiten so ver&auml;ndern, dass sie normal aussehen &mdash;
+aber im Quellcode oder in versteckten Tabs stecken wichtige Hinweise.<br><br>
+Eure Aufgabe: Durchsucht alle Tabs der Schulwebsite, findet den richtigen Notfallkontakt
+und sendet eine E-Mail mit dem genau richtigen Betreff.<br><br>
+<strong style="color:#6fb8ff;">Schaut genau hin &mdash; nicht alles ist, was es scheint! &#x1F50D;</strong></div>
+    <button class="ik-startbtn" onclick="startHack()">&#9654; Aufgabe starten</button>
+  </div>
+  <div id="intro-hack">
+    <canvas id="hcv"></canvas>
+    <div class="ih-inner">
+      <div class="ih-blink">&#9888; SYSTEM &Uuml;BERNOMMEN &#9888;</div>
+      <div class="ih-title">G4TEWAY</div>
+      <div class="ih-sub">MS2 SCHWAZ &mdash; TERMINAL 02</div>
+      <div class="ih-msg"><strong>// NACHRICHT AN DIE KLASSE //</strong>Ich habe die Website der MS2 Schwaz &uuml;bernommen.<br>
+Was ihr dort seht, geh&ouml;rt mir.<br><br>
+Findet den richtigen Notfallkontakt &mdash; wenn ihr den falschen nehmt, bekommt ihr nichts.
+Ich habe Fallen eingebaut. Nur wer beide Quellen vergleicht,
+erkennt den echten Code.<br><br>
+Bin gespannt, ob ihr es schafft.</div>
+      <button class="ih-btn" onclick="closeIntro()">[ AUFGABE STARTEN ]</button>
+    </div>
+  </div>
+</div>
+<div class="topbar">
+  <div style="display:flex;align-items:center;gap:14px;">
+    <div class="badge" style="background:#ffb34722;border:1px solid #ffb34755;color:#ffb347;">TERMINAL 02</div>
+    <div>
+      <div class="title">Kompromittierte Website</div>
+      <div class="school-sub">MS2 Schwaz &middot; <span>Fr. Kugl</span></div>
+    </div>
+  </div>
+  <div class="status"><div class="dot"></div>NETZWERK KOMPROMITTIERT</div>
+</div>
+<div class="prog"><div class="steps"><div class="sw"><div class="sc active" id="sc0">1</div><div class="sl active" id="sl0">Kontakt finden</div></div><div class="sline" id="ln0"></div><div class="sw"><div class="sc" id="sc1">2</div><div class="sl" id="sl1">E-Mail senden</div></div><div class="sline" id="ln1"></div><div class="sw"><div class="sc" id="sc2">3</div><div class="sl" id="sl2">Falle erkennen</div></div></div></div>
+<main>
+<div class="phase active" id="ph1">
+<div class="card">
+  <div class="ch">
+    <div class="ci" style="background:#ffb34715;">🌐</div>
+    <div><h2>Kompromittierte Schulwebsite</h2>
+    <p>G4TEWAY hat ms-digitburg.at übernommen. Finde den Notfallkontakt.</p></div>
+  </div>
+  <div class="cb">
+    <div class="mission">
+      <span class="ml">Aufgabe — Schritt 1 von 3</span>
+      Die Schulwebsite wurde gehackt. Du musst die IT-Notfall-E-Mail-Adresse
+      und die <strong>genaue Betreffzeile</strong> herausfinden.
+      Durchsuche alle Tabs — auch ungewöhnliche. G4TEWAY hat Fallen hinterlassen, lies genau.
+    </div>
+    <div style="background:var(--bg);border:1px solid var(--brd);border-radius:10px;overflow:hidden;margin-bottom:14px;">
+      <div style="background:var(--surf);border-bottom:1px solid var(--brd);display:flex;flex-wrap:wrap;">
+        <button class="wtab active" id="t0" onclick="wt(0)">Startseite</button>
+        <button class="wtab" id="t1" onclick="wt(1)">Stundenplan</button>
+        <button class="wtab" id="t2" onclick="wt(2)">Über uns</button>
+        <button class="wtab atab" id="t3" onclick="wt(3)">IT-Sicherheit ⚠</button>
+        <button class="wtab" id="t4" onclick="wt(4)">Kontakt</button>
+        <button class="wtab" id="t5" onclick="wt(5)">&lt;/&gt; Quellcode</button>
+      </div>
+      <div id="wp0" class="wpage" style="padding:16px;">
+        <div style="font-size:15px;font-weight:600;margin-bottom:8px;">Willkommen bei der MS Digitburg</div>
+        <div style="font-size:13px;color:var(--mut);line-height:1.8;">Aktuelle Ankündigungen und Schulinformationen.<br><br>
+        <span style="color:var(--red);font-family:'JetBrains Mono',monospace;font-size:12px;">⚠ SYSTEMWARNUNG: Netzwerk am 18.03 kompromittiert — Untersuchung läuft</span></div>
+      </div>
+      <div id="wp1" class="wpage" style="display:none;padding:16px;">
+        <div style="font-size:13px;font-weight:600;margin-bottom:10px;">Stundenplan 4B</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--mut);line-height:2.2;">Mo: Deutsch / Mathe / Englisch / Biologie<br>Di: Mathe / Deutsch / <span style="color:var(--red);">0x45 0x52 0x52 — GESPERRT</span> / IT<br>Mi: Englisch / Mathe / Physik / Deutsch<br>Do: Biologie / Englisch / <span style="color:var(--red);">ZUGRIFF VERWEIGERT [0x403]</span> / Sport</div>
+      </div>
+      <div id="wp2" class="wpage" style="display:none;padding:16px;">
+        <div style="font-size:13px;color:var(--mut);line-height:1.9;">Die MS Digitburg wurde 1987 gegründet und bietet modernen Unterricht für ca. 420 Schülerinnen und Schüler.<br><br>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#1a3050;">Zuletzt geändert: 2025-03-18 03:47 UTC // Nutzer=UNBEKANNT // Session=G4TEWAY</span></div>
+      </div>
+      <div id="wp3" class="wpage" style="display:none;padding:16px;">
+        <div style="background:#ff575710;border:1px solid #ff575730;border-radius:8px;padding:14px;margin-bottom:12px;">
+          <div style="font-weight:600;color:var(--red);margin-bottom:4px;font-size:13px;">⚠ SICHERHEITSVORFALL — AKTIV // PROTOKOLL-7 EINGELEITET</div>
+          <div style="font-size:12px;color:#aa6666;line-height:1.7;">Unbefugter Zugriff am 18.03 festgestellt. Verschlüsselungsangriff läuft. IT-Team braucht sofortige Hilfe. Protokoll-7 ist das Notfallverfahren.</div>
+        </div>
+        <div style="background:var(--bg);border:1px solid var(--brd);border-radius:8px;padding:14px;font-family:'JetBrains Mono',monospace;font-size:11px;line-height:2.3;margin-bottom:12px;">
+          <div style="color:var(--grn);">[03:41] System: Normalbetrieb</div>
+          <div style="color:var(--amb);">[03:43] WARN: Unbekannte Verbindung von 185.220.101.47</div>
+          <div style="color:var(--red);">[03:44] FEHLER: Firewall umgangen</div>
+          <div style="color:var(--red);">[03:45] FEHLER: Admin-Passwort geändert // Nutzer=G4TEWAY</div>
+          <div style="color:var(--red);">[03:47] FEHLER: Verschlüsselung gestartet auf /srv/schule/</div>
+          <div style="color:var(--acc);font-weight:700;">[03:49] SYS: PROTOKOLL-7 AKTIVIERT — IT-Notfall kontaktieren</div>
+        </div>
+        <div style="background:var(--surf);border:1px solid var(--brd);border-radius:8px;padding:14px;">
+          <div style="font-size:13px;font-weight:600;margin-bottom:6px;">IT-Notfallkontakt</div>
+          <div style="font-size:12px;color:var(--mut);line-height:1.9;">Sende sofort eine E-Mail mit <strong style="color:var(--txt);">genau</strong> der richtigen Betreffzeile — sonst antwortet das automatische System nicht.<br><br>
+          Adresse: <span style="font-family:'JetBrains Mono',monospace;background:var(--bg);border:1px solid var(--brd);border-radius:4px;padding:2px 8px;color:var(--acc);">ms2schwaz.notfall&#64;gmx.at</span><br>
+          Betreff muss enthalten: <span style="font-family:'JetBrains Mono',monospace;background:var(--bg);border:1px solid var(--brd);border-radius:4px;padding:2px 8px;color:var(--amb);">PROTOKOLL-7</span></div>
+        </div>
+      </div>
+      <div id="wp4" class="wpage" style="display:none;padding:16px;">
+        <div style="font-size:13px;color:var(--mut);line-height:2.">Allgemein: sekretariat&#64;ms-digitburg.at<br>Direktorin: Mag. Renate Holzer<br>IT: DI Klaus Brauer<br><br>
+        <span style="color:var(--red);font-family:'JetBrains Mono',monospace;font-size:11px;">⚠ IT-Abteilung wegen Vorfall aktuell nicht erreichbar</span></div>
+      </div>
+      <div id="wp5" class="wpage" style="display:none;padding:16px;">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--mut);
+            line-height:1.7;background:var(--bg);border:1px solid var(--brd);
+            border-radius:8px;padding:14px;overflow-x:auto;">
+          <div style="color:#3a5a3a;margin-bottom:4px;">/* G4TEWAY-EINSCHLEUSUNG — versteckte CSS-Variablen */</div>
+          <div style="color:var(--red);">--falle-code: "SPECTER"; <span style="color:#3a5a3a;">/* FALLE — nicht verwenden */</span></div>
+          <div style="color:var(--grn);">--echte-adresse: "ms2schwaz.notfall&#64;gmx.at";</div>
+          <div style="color:var(--grn);">--echte-betreff: "PROTOKOLL-7";</div>
+          <div style="color:#3a5a3a;margin-top:8px;">/* Beide Quellen bestätigt: IT-Sicherheit-Tab + dieser Code */</div>
+        </div>
+        <div style="font-size:12px;color:var(--mut);margin-top:12px;line-height:1.8;">
+          Der Quellcode bestätigt: die Notfalladresse ist <strong style="color:var(--txt);">ms2schwaz.notfall&#64;gmx.at</strong>
+          und der Betreff muss <strong style="color:var(--txt);">PROTOKOLL-7</strong> enthalten.
+          „SPECTER" ist eine von G4TEWAY hinterlassene Falle — nicht verwenden.
+        </div>
+      </div>
+    </div>
+    <div class="ig">
+      <label class="il">E-Mail-Adresse für den Notfall:</label>
+      <div class="ir">
+        <input class="ti" id="p1ia" placeholder="adresse&#64;domain.at"
+          autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false">
+      </div>
+      <label class="il" style="margin-top:10px;">Genaue Betreffzeile:</label>
+      <div class="ir">
+        <input class="ti" id="p1ib" placeholder="????????"
+          autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false"
+          oninput="this.value=this.value.toUpperCase()">
+        <button class="btn" onclick="chk1()">PRÜFEN</button>
+      </div>
+      <div class="fb" id="fb1"></div>
+    </div>
+    <div class="hw">
+      <button class="hbtn" onclick="th('h1')">💡 Hinweis anzeigen</button>
+      <div class="hc" id="h1">Schau in den Tab <strong>IT-Sicherheit ⚠</strong> und in den Tab <strong>&lt;/&gt; Quellcode</strong>.
+      Beide enthalten die richtige Adresse und den richtigen Betreff.
+      Achtung: „SPECTER" im Quellcode ist als Falle markiert — verwende stattdessen,
+      was in beiden Quellen als echt bestätigt wird.</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="phase" id="ph2">
+<div class="card">
+  <div class="ch">
+    <div class="ci" style="background:#4f9eff15;">📧</div>
+    <div><h2>Notfall-E-Mail senden</h2>
+    <p>Kontaktiere das IT-Notfallsystem und warte auf die automatische Antwort.</p></div>
+  </div>
+  <div class="cb">
+    <div class="mission">
+      <span class="ml">Aufgabe — Schritt 2 von 3</span>
+      Sende jetzt eine E-Mail an <strong style="color:var(--acc);">ms2schwaz.notfall&#64;gmx.at</strong>
+      mit <strong style="color:var(--acc);">PROTOKOLL-7</strong> im Betreff.
+      Das automatische System antwortet mit deinem Teilcode. Gib ihn unten ein.
+    </div>
+    <div style="background:var(--bg);border:1px solid var(--brd);border-radius:8px;
+        padding:16px;margin-bottom:14px;font-family:'JetBrains Mono',monospace;font-size:12px;">
+      <div style="color:var(--mut);margin-bottom:10px;">Entwurf:</div>
+      <div><span style="color:var(--mut);">An:</span> <span style="color:var(--acc);">ms2schwaz.notfall&#64;gmx.at</span></div>
+      <div><span style="color:var(--mut);">Betreff:</span> <span style="color:var(--amb);">PROTOKOLL-7 — Notfall</span></div>
+      <div style="margin-top:8px;color:var(--mut);">Text: (beliebig — der Betreff löst die automatische Antwort aus)</div>
+    </div>
+    <div class="ig">
+      <label class="il">Code aus der automatischen Antwort:</label>
+      <div class="ir">
+        <input class="ti" id="p2i" placeholder="???????"
+          autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false"
+          oninput="this.value=this.value.toUpperCase()">
+        <button class="btn" onclick="chk2()">PRÜFEN</button>
+      </div>
+      <div class="fb" id="fb2"></div>
+    </div>
+    <div class="hw">
+      <button class="hbtn" onclick="th('h2')">💡 Hinweis anzeigen</button>
+      <div class="hc" id="h2">Stelle sicher, dass du die E-Mail an die richtige Adresse gesendet hast
+      und PROTOKOLL-7 im Betreff steht. Schau in deinen Posteingang —
+      die automatische Antwort enthält deinen Teilcode.
+      Falls nichts angekommen ist, bitte die Lehrkraft, den E-Mail-Autoresponder zu überprüfen.</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="phase" id="ph3">
+<div class="card">
+  <div class="ch">
+    <div class="ci" style="background:#3ddc8415;">🎣</div>
+    <div><h2>Die Falle erkennen</h2>
+    <p>G4TEWAY hat einen gefälschten Code versteckt — warum?</p></div>
+  </div>
+  <div class="cb">
+    <div class="mission">
+      <span class="ml">Aufgabe — Schritt 3 von 3</span>
+      Im Quellcode stand „SPECTER" mit dem Hinweis: Falle. Warum hinterlässt ein Angreifer
+      absichtlich einen falschen Code? Wähle die richtige Erklärung.
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin:14px 0;" id="choices">
+      <div class="choice" onclick="pickC(0)">
+        <div class="cletter">A</div>
+        <div>Um Ermittler zu verlangsamen — wer den falschen Code eingibt, verliert Zeit.</div>
+      </div>
+      <div class="choice" onclick="pickC(1)">
+        <div class="cletter">B</div>
+        <div>Weil SPECTER tatsächlich der richtige Code ist — der Hinweis „Falle" ist der eigentliche Trick.</div>
+      </div>
+      <div class="choice" onclick="pickC(2)">
+        <div class="cletter">C</div>
+        <div>Um Antivirenprogramme zu verwirren, die nach verdächtigen Schlüsselwörtern suchen.</div>
+      </div>
+    </div>
+    <div class="fb" id="fb3"></div>
+  </div>
+</div>
+<div class="reveal" id="rev">
+  <div class="rl">TERMINAL 02 — TEILCODE FREIGESCHALTET</div>
+  <div class="rc">SPECTER</div>
+  <div class="rn">Notiere diesen Code. Du brauchst ihn am Ende beim Final-Terminal.</div>
+</div>
+</div>
+</main>
+<script>
+
+/* ── INTRO LOGIC ────────────────────────────────────────────── */
+var _ihcv=null,_ictx=null,_idrops=[];
+function _iRain(){
+  _ihcv=document.getElementById('hcv');
+  if(!_ihcv)return;
+  _ihcv.width=window.innerWidth;_ihcv.height=window.innerHeight;
+  _ictx=_ihcv.getContext('2d');_idrops=[];
+  for(var i=0;i<Math.floor(_ihcv.width/14);i++)_idrops.push(Math.random()*50);
+  setInterval(function(){
+    _ictx.fillStyle='rgba(0,0,0,.07)';_ictx.fillRect(0,0,_ihcv.width,_ihcv.height);
+    _ictx.fillStyle='#cc2200';_ictx.font='12px monospace';
+    var ch='01G4TEWAYMS2SCHWAZ';
+    _idrops.forEach(function(y,i){
+      _ictx.fillText(ch[Math.floor(Math.random()*ch.length)],i*14,y*14);
+      if(y*14>_ihcv.height&&Math.random()>.96)_idrops[i]=0;
+      _idrops[i]++;
+    });
+  },55);
+}
+function startHack(){
+  var k=document.getElementById('intro-kugl');
+  var h=document.getElementById('intro-hack');
+  var n=0;
+  var iv=setInterval(function(){
+    k.style.opacity=(n%2===0)?'0':'1';
+    n++;
+    if(n>9){clearInterval(iv);k.style.display='none';h.style.display='flex';_iRain();}
+  },80);
+}
+function closeIntro(){
+  var ov=document.getElementById('intro-overlay');
+  ov.style.transition='opacity .5s';ov.style.opacity='0';
+  setTimeout(function(){ov.style.display='none';},520);
+}
+/* ── END INTRO LOGIC ────────────────────────────────────────── */
+
+
+function th(id){document.getElementById(id).classList.toggle('open');}
+function setErr(ii,fi,m){
+  var f=document.getElementById(fi);f.className='fb err';f.textContent=m;
+  var i=document.getElementById(ii);i.className='ti err';
+  setTimeout(function(){i.className='ti';},500);
+}
+function advance(n,total){
+  var s=document.getElementById('sc'+n);s.className='sc done';s.textContent='✓';
+  if(n<total-1){
+    document.getElementById('ln'+n).className='sline done';
+    document.getElementById('sc'+(n+1)).className='sc active';
+    document.getElementById('sl'+(n+1)).className='sl active';
+  }
+}
+function nextPhase(from,total){
+  advance(from,total);
+  setTimeout(function(){
+    document.getElementById('ph'+(from+1)).classList.remove('active');
+    document.getElementById('ph'+(from+2)).classList.add('active');
+    window.scrollTo({top:0,behavior:'smooth'});
+  },1400);
+}
+
+
+function wt(n){
+  for(var i=0;i<6;i++){
+    document.getElementById('t'+i).classList.remove('active');
+    document.getElementById('wp'+i).style.display='none';
+  }
+  document.getElementById('t'+n).classList.add('active');
+  document.getElementById('wp'+n).style.display='block';
+}
+function chk1(){
+  var a=document.getElementById('p1ia').value.trim().toLowerCase();
+  var b=document.getElementById('p1ib').value.trim().toUpperCase();
+  var aOk=a.includes('ms2schwaz.notfall')||a.includes('gmx') || a.includes('ms2schwaz.notfall')||a.includes('gmx')||a.includes('notfall');
+  var bOk=b.includes('PROTOKOLL-7') || b.includes('PROTOKOLL7');
+  if(aOk && bOk){
+    var f=document.getElementById('fb1');f.className='fb ok';
+    f.textContent='✓ Richtig! ms2schwaz.notfall&#64;gmx.at + Betreff PROTOKOLL-7. Sende jetzt die E-Mail.';
+    document.getElementById('p1ia').className='ti ok';
+    document.getElementById('p1ib').className='ti ok';
+    nextPhase(0,3);
+  } else if(!aOk){
+    setErr('p1ia','fb1','✗ Schau in den IT-Sicherheit-Tab und den Quellcode-Tab für die richtige Adresse.');
+  } else {
+    setErr('p1ib','fb1','✗ Der Betreff muss PROTOKOLL-7 enthalten.');
+  }
+}
+function chk2(){
+  var v=document.getElementById('p2i').value.trim().toUpperCase();
+  if(v==='SPECTER'){
+    var f=document.getElementById('fb2');f.className='fb ok';
+    f.textContent='✓ Richtig! Die automatische Antwort hat den Code bestätigt.';
+    document.getElementById('p2i').className='ti ok';
+    nextPhase(1,3);
+  } else {
+    setErr('p2i','fb2','✗ Das ist nicht der Code aus der automatischen Antwort. Prüfe deinen Posteingang.');
+  }
+}
+function pickC(n){
+  document.querySelectorAll('.choice').forEach(function(c){
+    c.classList.remove('correct','wrong');
+  });
+  if(n===0){
+    document.querySelectorAll('.choice')[0].classList.add('correct');
+    var f=document.getElementById('fb3');f.className='fb ok';
+    f.textContent='✓ Genau! Angreifer hinterlassen falsche Fährten (sog. Honeytraps), um Ermittler zu verwirren und Zeit zu gewinnen.';
+    advance(2,3);
+    setTimeout(function(){document.getElementById('rev').classList.add('show');},600);
+  } else {
+    document.querySelectorAll('.choice')[n].classList.add('wrong');
+    document.getElementById('fb3').className='fb err';
+    document.getElementById('fb3').textContent='✗ Überlege: Warum will ein Angreifer Ermittler, die seinen Code suchen, in die Irre führen?';
+  }
+}
+
+</script>
+</body>
+</html>

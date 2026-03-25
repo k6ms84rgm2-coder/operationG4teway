@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>TERMINAL 03 — Passwörter & Binär | MS2 Schwaz</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;500;600;700&family=Nunito:wght@700;800&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#0b0f1a;
+  --surf:#111827;
+  --card:#1a2236;
+  --brd:#1e2d4a;
+  --brd2:#2e4270;
+  --acc:#f5a623;        /* MS2-Gold */
+  --school:#1a3a6b;     /* MS2-Dunkelblau */
+  --school2:#0d2347;
+  --grn:#3ddc84;
+  --red:#ff5757;
+  --amb:#ffb347;
+  --txt:#e8edf5;
+  --mut:#6b80a0;
+}
+body{background:var(--bg);color:var(--txt);font-family:'Inter',sans-serif;
+  font-size:15px;line-height:1.65;min-height:100vh;}
+
+/* ── Schulheader ── */
+.schulheader{
+  background:linear-gradient(135deg,var(--school2) 0%,var(--school) 100%);
+  border-bottom:3px solid var(--acc);
+  padding:10px 20px;
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;
+}
+.schul-left{display:flex;align-items:center;gap:12px;}
+.schul-logo{
+  width:40px;height:40px;border-radius:8px;
+  background:var(--acc);display:flex;align-items:center;justify-content:center;
+  font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;color:#000;
+  flex-shrink:0;letter-spacing:-.5px;
+}
+.schul-name{font-family:'Nunito',sans-serif;font-weight:800;font-size:15px;color:#fff;line-height:1.2;}
+.schul-sub{font-size:11px;color:rgba(255,255,255,.55);margin-top:1px;}
+.badge{border-radius:6px;padding:5px 12px;font-family:'JetBrains Mono',monospace;
+  font-size:11px;letter-spacing:1px;font-weight:700;}
+.status{display:flex;align-items:center;gap:7px;
+  font-family:'JetBrains Mono',monospace;font-size:11px;color:#ff7070;}
+.dot{width:7px;height:7px;border-radius:50%;background:#ff5757;
+  animation:pu 1.4s ease-in-out infinite;}
+@keyframes pu{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* ── Fortschrittsleiste ── */
+.prog{padding:12px 20px;background:var(--surf);border-bottom:1px solid var(--brd);}
+.steps{display:flex;align-items:center;}
+.sw{display:flex;align-items:center;gap:7px;}
+.sc{width:26px;height:26px;border-radius:50%;border:2px solid var(--brd2);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;
+  color:var(--mut);flex-shrink:0;transition:all .4s;}
+.sc.active{border-color:var(--acc);color:var(--acc);background:#f5a62312;}
+.sc.done{border-color:var(--grn);background:var(--grn);color:#000;}
+.sl{font-size:12px;color:var(--mut);transition:color .4s;white-space:nowrap;}
+.sl.active{color:var(--txt);}
+.sline{flex:1;height:2px;background:var(--brd);border-radius:1px;
+  min-width:20px;margin:0 8px;transition:background .4s;}
+.sline.done{background:var(--grn);}
+
+/* ── Main ── */
+main{max-width:740px;margin:0 auto;padding:24px 20px;}
+.phase{display:none;}.phase.active{display:block;animation:fi .3s ease;}
+@keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── Frau Kugl Sprechblase ── */
+.kugl-wrap{display:flex;align-items:flex-start;gap:14px;margin-bottom:18px;}
+.kugl-avatar{
+  flex-shrink:0;width:52px;height:52px;border-radius:50%;
+  background:linear-gradient(135deg,var(--school),var(--acc));
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;border:3px solid var(--acc);
+  box-shadow:0 0 0 4px #f5a62318;
+}
+.kugl-bubble{
+  background:linear-gradient(135deg,var(--school) 0%,#1e3a7a 100%);
+  border:1px solid #2e4a8a;border-radius:0 14px 14px 14px;
+  padding:14px 16px;flex:1;position:relative;
+}
+.kugl-bubble::before{
+  content:'';position:absolute;top:10px;left:-10px;
+  border:5px solid transparent;border-right-color:#1a3a6b;
+}
+.kugl-name{font-family:'Nunito',sans-serif;font-weight:800;font-size:12px;
+  color:var(--acc);letter-spacing:.5px;margin-bottom:5px;}
+.kugl-text{font-size:13px;color:#c8d8f0;line-height:1.75;}
+.kugl-text strong{color:#fff;}
+
+/* ── Card ── */
+.card{background:var(--card);border:1px solid var(--brd);
+  border-radius:12px;overflow:hidden;margin-bottom:16px;}
+.ch{padding:14px 18px;border-bottom:1px solid var(--brd);
+  display:flex;align-items:center;gap:10px;}
+.ci{width:34px;height:34px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;}
+.ch h2{font-size:14px;font-weight:600;}
+.ch p{font-size:12px;color:var(--mut);margin-top:2px;}
+.cb{padding:18px;}
+
+/* ── Aufgaben-Box ── */
+.aufgabe{background:#f5a6230d;border:1px solid #f5a62330;border-radius:10px;
+  padding:14px 16px;margin-bottom:16px;font-size:13px;color:#d4b870;line-height:1.75;}
+.aufgabe-label{color:var(--acc);display:block;margin-bottom:5px;font-size:10px;
+  letter-spacing:1.5px;text-transform:uppercase;
+  font-family:'JetBrains Mono',monospace;font-weight:700;}
+
+/* ── Inputs ── */
+.ig{margin-top:14px;}
+.il{font-size:12px;color:var(--mut);font-family:'JetBrains Mono',monospace;
+  margin-bottom:7px;display:block;}
+.ir{display:flex;gap:8px;}
+.ti{background:var(--bg);border:1.5px solid var(--brd2);border-radius:8px;
+  padding:10px 14px;color:var(--txt);font-family:'JetBrains Mono',monospace;
+  font-size:13px;flex:1;outline:none;transition:border-color .2s;min-width:0;}
+.ti:focus{border-color:var(--acc);}
+.ti.ok{border-color:var(--grn);background:#3ddc8406;}
+.ti.err{border-color:var(--red);animation:sk .3s;}
+@keyframes sk{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.btn{background:var(--acc);border:none;border-radius:8px;padding:10px 20px;
+  color:#000;font-family:'JetBrains Mono',monospace;font-size:12px;
+  font-weight:700;cursor:pointer;letter-spacing:.5px;
+  transition:all .15s;white-space:nowrap;}
+.btn:hover{background:#e09510;transform:translateY(-1px);}
+.btn-w{width:100%;margin-top:10px;padding:12px;}
+.fb{font-size:12px;margin-top:8px;min-height:18px;
+  font-family:'JetBrains Mono',monospace;}
+.fb.ok{color:var(--grn);}.fb.err{color:var(--red);}
+
+/* ── Hinweis ── */
+.hw{margin-top:12px;}
+.hbtn{background:none;border:1px solid var(--brd2);border-radius:8px;
+  padding:7px 13px;color:var(--mut);font-family:'JetBrains Mono',monospace;
+  font-size:11px;cursor:pointer;transition:all .2s;
+  display:inline-flex;align-items:center;gap:6px;}
+.hbtn:hover{border-color:var(--amb);color:var(--amb);}
+.hc{display:none;margin-top:8px;background:#ffb34710;
+  border:1px solid #ffb34730;border-radius:8px;padding:12px 14px;
+  font-size:12px;color:#c9a06a;line-height:1.75;}
+.hc.open{display:block;animation:fi .2s ease;}
+
+/* ── Teilcode-Reveal ── */
+.reveal{display:none;background:linear-gradient(135deg,#f5a6230a,#1a3a6b10);
+  border:1.5px solid var(--acc);border-radius:12px;
+  padding:24px;text-align:center;margin-top:16px;}
+.reveal.show{display:block;animation:fi .5s ease;}
+.rl{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--acc);
+  letter-spacing:3px;margin-bottom:10px;opacity:.8;}
+.rc{font-family:'JetBrains Mono',monospace;font-size:44px;font-weight:700;
+  color:var(--acc);letter-spacing:8px;text-shadow:0 0 20px #f5a62340;}
+.rn{font-size:12px;color:var(--mut);margin-top:8px;}
+
+/* ── Util ── */
+.tag{display:inline-block;background:var(--brd);border-radius:4px;
+  padding:1px 6px;font-family:'JetBrains Mono',monospace;font-size:12px;}
+
+.crit{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--mut);padding:8px 10px;background:var(--surf);border-radius:8px;transition:color .2s;}
+.crit.pass{color:var(--grn);}
+.cdot{width:8px;height:8px;border-radius:50%;background:var(--brd2);flex-shrink:0;transition:background .2s;}
+
+/* ══ INTRO OVERLAY ══════════════════════════════════════════════════════ */
+#intro-overlay{
+  position:fixed;inset:0;z-index:9999;
+  display:flex;align-items:center;justify-content:center;
+  background:#000;overflow:hidden;
+}
+/* Phase A: Frau Kugl */
+#intro-kugl{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;padding:32px 24px;
+  background:linear-gradient(160deg,#0b1929 0%,#060e1c 100%);
+}
+.ik-logo{font-family:'JetBrains Mono',monospace;font-size:11px;color:#4f9eff;
+  letter-spacing:3px;margin-bottom:24px;opacity:.7;}
+.ik-avatar{width:90px;height:90px;border-radius:50%;
+  background:linear-gradient(135deg,#1a3560,#0d2040);
+  border:3px solid #4f9eff55;display:flex;align-items:center;
+  justify-content:center;font-size:40px;margin-bottom:14px;
+  box-shadow:0 0 40px #4f9eff18;}
+.ik-name{font-family:'JetBrains Mono',monospace;font-size:13px;
+  color:#4f9eff;letter-spacing:2px;margin-bottom:3px;font-weight:700;}
+.ik-role{font-size:12px;color:#2a4a6a;margin-bottom:26px;}
+.ik-bubble{background:#0e1e35;border:1px solid #1a3558;border-radius:14px;
+  border-top-left-radius:4px;padding:18px 22px;max-width:520px;
+  font-size:14px;color:#c8ddf0;line-height:1.85;margin-bottom:26px;
+  position:relative;text-align:left;}
+.ik-bubble::before{content:'';position:absolute;top:-1px;left:-1px;
+  width:14px;height:14px;background:#0e1e35;
+  border-left:1px solid #1a3558;border-top:1px solid #1a3558;
+  border-radius:0 0 8px 0;}
+.ik-startbtn{background:#4f9eff;border:none;border-radius:10px;
+  padding:13px 34px;color:#fff;font-family:'JetBrains Mono',monospace;
+  font-size:13px;font-weight:700;cursor:pointer;letter-spacing:1px;
+  transition:all .2s;}
+.ik-startbtn:hover{background:#3d8ef0;transform:translateY(-1px);}
+
+/* Phase B: G4TEWAY */
+#intro-hack{
+  position:absolute;inset:0;display:none;flex-direction:column;
+  align-items:center;justify-content:center;padding:24px;
+  background:#000;overflow:hidden;
+}
+#hcv{position:absolute;inset:0;pointer-events:none;}
+.ih-inner{position:relative;z-index:2;text-align:center;
+  animation:ghk .45s ease;}
+@keyframes ghk{
+  0%{opacity:0;transform:skewX(-10deg) scale(1.05)}
+  40%{opacity:1;transform:skewX(4deg)}
+  70%{transform:skewX(-1deg)}
+  100%{transform:skewX(0) scale(1)}
+}
+.ih-blink{font-family:'JetBrains Mono',monospace;font-size:11px;
+  color:#ff5757;letter-spacing:4px;margin-bottom:12px;
+  animation:ibl .85s step-end infinite;}
+@keyframes ibl{0%,100%{opacity:1}50%{opacity:0}}
+.ih-title{font-family:'JetBrains Mono',monospace;
+  font-size:clamp(40px,8vw,68px);font-weight:700;color:#ff5757;
+  letter-spacing:4px;line-height:1;margin-bottom:6px;
+  text-shadow:0 0 40px #ff575766;}
+.ih-sub{font-family:'JetBrains Mono',monospace;font-size:12px;
+  color:#aa3333;letter-spacing:2px;margin-bottom:22px;}
+.ih-msg{background:#120000;border:1px solid #ff575730;border-radius:10px;
+  padding:16px 22px;max-width:520px;font-size:13px;color:#ff9999;
+  line-height:1.85;margin-bottom:26px;font-family:'JetBrains Mono',monospace;
+  text-align:left;}
+.ih-msg strong{color:#ff5757;display:block;font-size:10px;
+  letter-spacing:2px;margin-bottom:8px;}
+.ih-btn{background:transparent;border:2px solid #ff5757;border-radius:10px;
+  padding:13px 34px;color:#ff5757;font-family:'JetBrains Mono',monospace;
+  font-size:13px;font-weight:700;cursor:pointer;letter-spacing:1px;
+  transition:all .2s;}
+.ih-btn:hover{background:#ff5757;color:#000;}
+/* ══ END INTRO ══════════════════════════════════════════════════════════ */
+</style>
+</head>
+<body>
+
+<div id="intro-overlay">
+  <div id="intro-kugl">
+    <div class="ik-logo">MS2 SCHWAZ // OPERATION SCHILD // TERMINAL 03</div>
+    <div class="ik-avatar">👩‍🏫</div>
+    <div class="ik-name">FRAU KUGL</div>
+    <div class="ik-role">Lehrerin · MS2 Schwaz</div>
+    <div class="ik-bubble">Hallo! Ich bin <strong>Frau Kugl</strong> von der MS2 Schwaz.<br><br>
+Heute geht es um <strong>sichere Passwörter</strong> und <strong>Binärcode</strong>.
+„hallo123" kann in etwa 2 Sekunden geknackt werden. Wir schauen uns an,
+was ein wirklich sicheres Passwort ausmacht — und warum Computer intern
+alles als Nullen und Einsen speichern.<br><br>
+Entschlüsselt eine Binärnachricht, erkennt das sicherste Passwort
+und erstellt dann selbst eines, das alle Kriterien erfüllt.<br><br>
+<strong style="color:#6fb8ff;">Zeigt mir euer bestes Passwort! 🔑</strong></div>
+    <button class="ik-startbtn" onclick="startHack()">▶ Aufgabe starten</button>
+  </div>
+  <div id="intro-hack">
+    <canvas id="hcv"></canvas>
+    <div class="ih-inner">
+      <div class="ih-blink">⚠ SYSTEM ÜBERNOMMEN ⚠</div>
+      <div class="ih-title">G4TEWAY</div>
+      <div class="ih-sub">MS2 SCHWAZ — TERMINAL 03</div>
+      <div class="ih-msg"><strong>// NACHRICHT AN DIE KLASSE //</strong>Ich kenne eure Passwörter. Na ja — fast alle.<br>
+„Digitburg99", „Sommer2024", „hallo123" — alles schon geknackt.<br><br>
+Eines aber nicht. Findet heraus, welches.
+Und beweist mir, dass ihr selbst eines erstellen könnt,
+das ich nicht in Minuten knacken kann.<br><br>
+Zuerst aber: Entschlüsselt meine Binärnachricht. Die Bits lügen nicht.</div>
+      <button class="ih-btn" onclick="closeIntro()">[ AUFGABE STARTEN ]</button>
+    </div>
+  </div>
+</div>
+<div class="schulheader">
+  <div class="schul-left">
+    <div class="schul-logo">MS2</div>
+    <div>
+      <div class="schul-name">Mittelschule 2 Schwaz</div>
+      <div class="schul-sub">Operation Schild · Cybersicherheit</div>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+    <div class="badge" style="background:#a78bfa22;border:1px solid #a78bfa55;color:#a78bfa;">TERMINAL 03</div>
+    <div class="title" style="font-weight:700;font-size:15px;color:#fff;">Passwörter & Binär</div>
+    <div class="status"><div class="dot"></div>NETZWERK KOMPROMITTIERT</div>
+  </div>
+</div>
+<div class="prog"><div class="steps"><div class="sw"><div class="sc active" id="sc0">1</div><div class="sl active" id="sl0">Binär entschlüsseln</div></div><div class="sline" id="ln0"></div><div class="sw"><div class="sc" id="sc1">2</div><div class="sl" id="sl1">Schwaches PW erkennen</div></div><div class="sline" id="ln1"></div><div class="sw"><div class="sc" id="sc2">3</div><div class="sl" id="sl2">Sicheres PW erstellen</div></div></div></div>
+<main>
+<div class="phase active" id="ph1">
+<div class="kugl-wrap">
+  <div class="kugl-avatar">👩‍🏫</div>
+  <div class="kugl-bubble">
+    <div class="kugl-name">FR. KUGL — MS2 SCHWAZ</div>
+    <div class="kugl-text">Jetzt wird's mathematisch! <strong>Binärcode</strong> ist die Sprache der Computer — nur Nullen und Einsen. Jede 8er-Gruppe steht für einen Buchstaben. Rechnet Schritt für Schritt: Welche Stellen haben eine Eins? Addiert ihre Werte. Dann in der ASCII-Tabelle nachschauen!</div>
+  </div>
+</div>
+<div class="card">
+  <div class="ch"><div class="ci" style="background:#a78bfa15;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:#a78bfa;">01</div>
+    <div><h2>Binärcode entschlüsseln</h2><p>G4TEWAY hat eine Nachricht im Binärformat hinterlassen.</p></div>
+  </div>
+  <div class="cb">
+    <div class="aufgabe"><span class="aufgabe-label">Aufgabe — Schritt 1 von 3</span>
+      Rechne jede 8-Bit-Gruppe in eine Dezimalzahl um und such den passenden Buchstaben in der ASCII-Tabelle. Aus den 5 Buchstaben ergibt sich ein Geheimwort.
+    </div>
+    <div style="background:var(--bg);border:1px solid var(--brd);border-radius:8px;padding:14px;font-family:'JetBrains Mono',monospace;font-size:12px;margin-bottom:14px;">
+      <div style="font-size:10px;color:var(--mut);letter-spacing:1px;margin-bottom:12px;">ASCII: A=65 B=66 C=67 D=68 E=69 F=70 G=71 H=72 I=73 J=74 K=75 L=76 M=77 N=78 O=79 P=80 Q=81 R=82 S=83 T=84 U=85 V=86 W=87 X=88 Y=89 Z=90</div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div style="display:flex;align-items:center;gap:14px;padding:10px 12px;background:var(--surf);border-radius:6px;flex-wrap:wrap;"><span style="color:var(--mut);min-width:20px;">1.</span><span style="color:var(--amb);letter-spacing:3px;font-size:15px;">01001011</span><span style="color:var(--mut);font-size:11px;">= 64+8+2+1 = ?</span></div>
+        <div style="display:flex;align-items:center;gap:14px;padding:10px 12px;background:var(--surf);border-radius:6px;flex-wrap:wrap;"><span style="color:var(--mut);min-width:20px;">2.</span><span style="color:var(--amb);letter-spacing:3px;font-size:15px;">01010010</span><span style="color:var(--mut);font-size:11px;">= 64+16+2 = ?</span></div>
+        <div style="display:flex;align-items:center;gap:14px;padding:10px 12px;background:var(--surf);border-radius:6px;flex-wrap:wrap;"><span style="color:var(--mut);min-width:20px;">3.</span><span style="color:var(--amb);letter-spacing:3px;font-size:15px;">01011001</span><span style="color:var(--mut);font-size:11px;">= 64+16+8+1 = ?</span></div>
+        <div style="display:flex;align-items:center;gap:14px;padding:10px 12px;background:var(--surf);border-radius:6px;flex-wrap:wrap;"><span style="color:var(--mut);min-width:20px;">4.</span><span style="color:var(--amb);letter-spacing:3px;font-size:15px;">01010000</span><span style="color:var(--mut);font-size:11px;">= 64+16 = ?</span></div>
+        <div style="display:flex;align-items:center;gap:14px;padding:10px 12px;background:var(--surf);border-radius:6px;flex-wrap:wrap;"><span style="color:var(--mut);min-width:20px;">5.</span><span style="color:var(--amb);letter-spacing:3px;font-size:15px;">01010100</span><span style="color:var(--mut);font-size:11px;">= 64+16+4 = ?</span></div>
+      </div>
+    </div>
+    <div class="ig"><label class="il">5-stelliges Geheimwort:</label>
+      <div class="ir"><input class="ti" id="p1i" maxlength="5" placeholder="?????" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" oninput="this.value=this.value.toUpperCase()"><button class="btn" onclick="chk1()">PRÜFEN</button></div>
+      <div class="fb" id="fb1"></div>
+    </div>
+    <div class="hw"><button class="hbtn" onclick="th('h1')">💡 Hinweis anzeigen</button>
+    <div class="hc" id="h1">Addiere nur die Stellenwerte der <strong>Einsen</strong>. Positionen von links: 128, 64, 32, 16, 8, 4, 2, 1. Erste Zeile: 01001011 → 64+8+2+1 = 75 → K.</div></div>
+  </div>
+</div>
+</div>
+
+<div class="phase" id="ph2">
+<div class="kugl-wrap">
+  <div class="kugl-avatar">👩‍🏫</div>
+  <div class="kugl-bubble">
+    <div class="kugl-name">FR. KUGL — MS2 SCHWAZ</div>
+    <div class="kugl-text">Sehr gut! Jetzt zum Thema Passwörter. <strong>Schwache Passwörter sind eine der häufigsten Ursachen für Hackerangriffe.</strong> Schaut euch die Tabelle an: Wie lange braucht G4TEWAY zum Knacken? Ihr werdet überrascht sein, wie schnell das geht!</div>
+  </div>
+</div>
+<div class="card">
+  <div class="ch"><div class="ci" style="background:#ff575715;">🔑</div>
+    <div><h2>Passwortsicherheit analysieren</h2><p>Welches Passwort kann G4TEWAY nicht knacken?</p></div>
+  </div>
+  <div class="cb">
+    <div class="aufgabe"><span class="aufgabe-label">Aufgabe — Schritt 2 von 3</span>
+      G4TEWAY kann 4 dieser 5 Passwörter automatisch knacken. Nur eines ist wirklich sicher. Klickt auf das unknackbare Passwort.
+    </div>
+    <div style="overflow-x:auto;margin-bottom:14px;">
+      <table style="width:100%;border-collapse:collapse;font-size:12px;">
+        <thead><tr style="background:var(--surf);"><th style="padding:9px 10px;text-align:left;border-bottom:1px solid var(--brd);color:var(--mut);font-size:10px;font-family:'JetBrains Mono',monospace;font-weight:500;">PASSWORT</th><th style="padding:9px 10px;text-align:left;border-bottom:1px solid var(--brd);color:var(--mut);font-size:10px;font-family:'JetBrains Mono',monospace;font-weight:500;">STÄRKE</th><th style="padding:9px 10px;text-align:left;border-bottom:1px solid var(--brd);color:var(--mut);font-size:10px;font-family:'JetBrains Mono',monospace;font-weight:500;">KNACK-ZEIT</th><th style="padding:9px 10px;text-align:left;border-bottom:1px solid var(--brd);color:var(--mut);font-size:10px;font-family:'JetBrains Mono',monospace;font-weight:500;">WARUM?</th></tr></thead>
+        <tbody>
+          <tr id="pr0" onclick="pickPw(0)" style="cursor:pointer;transition:background .2s;"><td style="padding:10px;border-bottom:1px solid var(--brd);font-family:'JetBrains Mono',monospace;">hallo123</td><td style="padding:10px;border-bottom:1px solid var(--brd);"><div style="width:60px;height:6px;background:var(--brd);border-radius:3px;"><div style="width:12%;height:100%;background:var(--red);border-radius:3px;"></div></div></td><td style="padding:10px;border-bottom:1px solid var(--brd);font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--red);">~2 Sekunden</td><td style="padding:10px;border-bottom:1px solid var(--brd);font-size:12px;color:var(--mut);">Wörterbuchwort + Zahlen</td></tr>
+          <tr id="pr1" onclick="pickPw(1)" style="cursor:pointer;transition:background .2s;"><td style="padding:10px;border-bottom:1px solid var(--brd);font-family:'JetBrains Mono',monospace;">Sommer2024!</td><td style="padding:10px;border-bottom:1px solid var(--brd);"><div style="width:60px;height:6px;background:var(--brd);border-radius:3px;"><div style="width:35%;height:100%;background:var(--amb);border-radius:3px;"></div></div></td><td style="padding:10px;border-bottom:1px solid var(--brd);font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--amb);">~3 Minuten</td><td style="padding:10px;border-bottom:1px solid var(--brd);font-size:12px;color:var(--mut);">Wort + Jahr = vorhersehbares Muster</td></tr>
+          <tr id="pr2" onclick="pickPw(2)" style="cursor:pointer;transition:background .2s;"><td style="padding:10px;border-bottom:1px solid var(--brd);font-family:'JetBrains Mono',monospace;">P@ssw0rt</td><td style="padding:10px;border-bottom:1px solid var(--brd);"><div style="width:60px;height:6px;background:var(--brd);border-radius:3px;"><div style="width:28%;height:100%;background:var(--amb);border-radius:3px;"></div></div></td><td style="padding:10px;border-bottom:1px solid var(--brd);font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--amb);">~45 Sekunden</td><td style="padding:10px;border-bottom:1px solid var(--brd);font-size:12px;color:var(--mut);">@ für a steht in jedem Hacker-Wörterbuch</td></tr>
+          <tr id="pr3" onclick="pickPw(3)" style="cursor:pointer;transition:background .2s;"><td style="padding:10px;border-bottom:1px solid var(--brd);font-family:'JetBrains Mono',monospace;">kV#9mL$2pQr!</td><td style="padding:10px;border-bottom:1px solid var(--brd);"><div style="width:60px;height:6px;background:var(--brd);border-radius:3px;"><div style="width:100%;height:100%;background:var(--grn);border-radius:3px;"></div></div></td><td style="padding:10px;border-bottom:1px solid var(--brd);font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--grn);">&gt; 1 Milliarde Jahre</td><td style="padding:10px;border-bottom:1px solid var(--brd);font-size:12px;color:var(--mut);">Völlig zufällig, 94-Zeichen-Pool</td></tr>
+          <tr id="pr4" onclick="pickPw(4)" style="cursor:pointer;transition:background .2s;"><td style="padding:10px;font-family:'JetBrains Mono',monospace;">Digitburg99</td><td style="padding:10px;"><div style="width:60px;height:6px;background:var(--brd);border-radius:3px;"><div style="width:18%;height:100%;background:var(--red);border-radius:3px;"></div></div></td><td style="padding:10px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--red);">~18 Sekunden</td><td style="padding:10px;font-size:12px;color:var(--mut);">Schulname wird bei gezielten Angriffen zuerst probiert</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="fb" id="fb2"></div>
+    <div class="hw"><button class="hbtn" onclick="th('h2')">💡 Hinweis anzeigen</button>
+    <div class="hc" id="h2">Schau auf die Knack-Zeit. Wörterbuchwörter, Jahreszahlen und Buchstaben-Ersetzungen werden in Sekunden geknackt. Nur ein völlig zufälliges langes Passwort ist wirklich sicher.</div></div>
+  </div>
+</div>
+</div>
+
+<div class="phase" id="ph3">
+<div class="kugl-wrap">
+  <div class="kugl-avatar">👩‍🏫</div>
+  <div class="kugl-bubble">
+    <div class="kugl-name">FR. KUGL — MS2 SCHWAZ</div>
+    <div class="kugl-text">Fast fertig! Ihr habt gelernt, was ein schwaches Passwort ist — jetzt <strong>erstellt ihr selbst ein starkes</strong>. Alle 5 Punkte müssen grün werden. Tipp: Benutzt keine echten Wörter, sondern eine zufällige Mischung aus Groß- und Kleinbuchstaben, Zahlen und Sonderzeichen.</div>
+  </div>
+</div>
+<div class="card">
+  <div class="ch"><div class="ci" style="background:#3ddc8415;">🛡</div>
+    <div><h2>Sicheres Passwort erstellen</h2><p>Erstellt ein Passwort, das alle 5 Kriterien erfüllt.</p></div>
+  </div>
+  <div class="cb">
+    <div class="aufgabe"><span class="aufgabe-label">Aufgabe — Schritt 3 von 3</span>
+      Um den Backup-Server wieder freizuschalten, müsst ihr ein neues sicheres Passwort setzen. Alle 5 Kriterien müssen grün leuchten.
+    </div>
+    <div style="margin:14px 0;">
+      <input id="pwbuild" style="width:100%;background:var(--bg);border:1.5px solid var(--brd2);border-radius:8px;padding:12px 16px;color:var(--txt);font-family:'JetBrains Mono',monospace;font-size:16px;outline:none;letter-spacing:1px;transition:border-color .2s;" placeholder="Neues Passwort eingeben..." autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" oninput="liveChk()" onfocus="this.style.borderColor='var(--acc)'" onblur="this.style.borderColor='var(--brd2)'">
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;">
+      <div class="crit" id="c1"><div class="cdot"></div>Mindestens 12 Zeichen</div>
+      <div class="crit" id="c2"><div class="cdot"></div>Großbuchstabe (A–Z)</div>
+      <div class="crit" id="c3"><div class="cdot"></div>Kleinbuchstabe (a–z)</div>
+      <div class="crit" id="c4"><div class="cdot"></div>Zahl (0–9)</div>
+      <div class="crit" id="c5" style="grid-column:1/-1;"><div class="cdot"></div>Sonderzeichen (!@#$&amp;*)</div>
+    </div>
+    <button class="btn btn-w" onclick="chk3()">✓ Passwort einreichen</button>
+    <div class="fb" id="fb3"></div>
+  </div>
+</div>
+<div class="reveal" id="rev">
+  <div class="rl">TERMINAL 03 — TEILCODE FREIGESCHALTET</div>
+  <div class="rc">CIPHER</div>
+  <div class="rn">Notiere diesen Code sorgfältig. Du brauchst ihn am Ende beim Final-Terminal.</div>
+</div>
+</div>
+</main>
+<script>
+function th(id){document.getElementById(id).classList.toggle('open');}
+function setErr(ii,fi,m){
+  var f=document.getElementById(fi);f.className='fb err';f.textContent=m;
+  var i=document.getElementById(ii);i.className='ti err';
+  setTimeout(function(){i.className='ti';},500);
+}
+function advance(n,total){
+  var s=document.getElementById('sc'+n);s.className='sc done';s.textContent='✓';
+  if(n<total-1){
+    document.getElementById('ln'+n).className='sline done';
+    document.getElementById('sc'+(n+1)).className='sc active';
+    document.getElementById('sl'+(n+1)).className='sl active';
+  }
+}
+function nextPhase(from,total){
+  advance(from,total);
+  setTimeout(function(){
+    document.getElementById('ph'+(from+1)).classList.remove('active');
+    document.getElementById('ph'+(from+2)).classList.add('active');
+    window.scrollTo({top:0,behavior:'smooth'});
+  },1400);
+}
+
+function chk1(){var v=document.getElementById('p1i').value.trim().toUpperCase();if(v==='KRYPT'){var f=document.getElementById('fb1');f.className='fb ok';f.textContent='✓ Richtig! 75=K, 82=R, 89=Y, 80=P, 84=T → KRYPT';document.getElementById('p1i').className='ti ok';nextPhase(0,3);}else{setErr('p1i','fb1','✗ Addiere die Stellenwerte der Einsen und schlag das Ergebnis in der ASCII-Tabelle nach.');}}
+function pickPw(n){for(var i=0;i<5;i++)document.getElementById('pr'+i).style.background='';if(n===3){document.getElementById('pr3').style.background='#3ddc8408';var f=document.getElementById('fb2');f.className='fb ok';f.textContent='✓ Richtig! kV#9mL$2pQr! ist völlig zufällig — länger als das Universum alt ist zum Brute-Forcen.';nextPhase(1,3);}else{document.getElementById('pr'+n).style.background='#ff575708';var msgs=['Wörterbuchwort + Zahlen = sofort geknackt.','Wort + Jahr = in Minuten geknackt.','@-Ersetzungen stehen in jedem Hacker-Wörterbuch.','','Schulname wird bei gezielten Angriffen immer zuerst versucht.'];document.getElementById('fb2').className='fb err';document.getElementById('fb2').textContent='✗ '+msgs[n]+' Schau auf die Knack-Zeit.';}}
+function liveChk(){var pw=document.getElementById('pwbuild').value;var checks=[pw.length>=12,/[A-Z]/.test(pw),/[a-z]/.test(pw),/[0-9]/.test(pw),/[^a-zA-Z0-9]/.test(pw)];checks.forEach(function(ok,i){var el=document.getElementById('c'+(i+1));el.className='crit'+(ok?' pass':'');el.querySelector('.cdot').style.background=ok?'var(--grn)':'var(--brd2)';});}
+function chk3(){var pw=document.getElementById('pwbuild').value;if(pw.length>=12&&/[A-Z]/.test(pw)&&/[a-z]/.test(pw)&&/[0-9]/.test(pw)&&/[^a-zA-Z0-9]/.test(pw)){var f=document.getElementById('fb3');f.className='fb ok';f.textContent='✓ Alle Kriterien erfüllt! Passwort akzeptiert.';advance(2,3);setTimeout(function(){document.getElementById('rev').classList.add('show');},600);}else{document.getElementById('fb3').className='fb err';document.getElementById('fb3').textContent='✗ Noch nicht alle Kriterien erfüllt — schau auf die grünen Punkte.';}}
+
+/* ── INTRO LOGIC ─────────────────────────────────────────────── */
+(function(){
+  var hcv=null,hctx=null,hdrops=[];
+  function initRain(){
+    hcv=document.getElementById('hcv');
+    if(!hcv)return;
+    hcv.width=window.innerWidth;hcv.height=window.innerHeight;
+    hctx=hcv.getContext('2d');
+    hdrops=[];
+    for(var i=0;i<Math.floor(hcv.width/14);i++)hdrops.push(Math.random()*50);
+    setInterval(rain,55);
+  }
+  function rain(){
+    if(!hctx)return;
+    hctx.fillStyle='rgba(0,0,0,.07)';hctx.fillRect(0,0,hcv.width,hcv.height);
+    hctx.fillStyle='#cc2200';hctx.font='12px monospace';
+    var ch='01G4TEWAYMS2!@#';
+    hdrops.forEach(function(y,i){
+      hctx.fillText(ch[Math.floor(Math.random()*ch.length)],i*14,y*14);
+      if(y*14>hcv.height&&Math.random()>.96)hdrops[i]=0;
+      hdrops[i]++;
+    });
+  }
+  window.startHack=function(){
+    var kugl=document.getElementById('intro-kugl');
+    var hack=document.getElementById('intro-hack');
+    var n=0;
+    var iv=setInterval(function(){
+      kugl.style.opacity=(n%2===0)?'0':'1';
+      n++;
+      if(n>9){
+        clearInterval(iv);
+        kugl.style.display='none';
+        hack.style.display='flex';
+        initRain();
+      }
+    },80);
+  };
+  window.closeIntro=function(){
+    var ov=document.getElementById('intro-overlay');
+    ov.style.transition='opacity .5s';
+    ov.style.opacity='0';
+    setTimeout(function(){ov.style.display='none';},520);
+  };
+})();
+/* ── END INTRO LOGIC ─────────────────────────────────────────── */
+</script>
+</body>
+</html>
