@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>TERMINAL 05 — Netzwerksicherheit | MS2 Schwaz</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;500;600;700&family=Nunito:wght@700;800&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#0b0f1a;
+  --surf:#111827;
+  --card:#1a2236;
+  --brd:#1e2d4a;
+  --brd2:#2e4270;
+  --acc:#f5a623;        /* MS2-Gold */
+  --school:#1a3a6b;     /* MS2-Dunkelblau */
+  --school2:#0d2347;
+  --grn:#3ddc84;
+  --red:#ff5757;
+  --amb:#ffb347;
+  --txt:#e8edf5;
+  --mut:#6b80a0;
+}
+body{background:var(--bg);color:var(--txt);font-family:'Inter',sans-serif;
+  font-size:15px;line-height:1.65;min-height:100vh;}
+
+/* ── Schulheader ── */
+.schulheader{
+  background:linear-gradient(135deg,var(--school2) 0%,var(--school) 100%);
+  border-bottom:3px solid var(--acc);
+  padding:10px 20px;
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;
+}
+.schul-left{display:flex;align-items:center;gap:12px;}
+.schul-logo{
+  width:40px;height:40px;border-radius:8px;
+  background:var(--acc);display:flex;align-items:center;justify-content:center;
+  font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;color:#000;
+  flex-shrink:0;letter-spacing:-.5px;
+}
+.schul-name{font-family:'Nunito',sans-serif;font-weight:800;font-size:15px;color:#fff;line-height:1.2;}
+.schul-sub{font-size:11px;color:rgba(255,255,255,.55);margin-top:1px;}
+.badge{border-radius:6px;padding:5px 12px;font-family:'JetBrains Mono',monospace;
+  font-size:11px;letter-spacing:1px;font-weight:700;}
+.status{display:flex;align-items:center;gap:7px;
+  font-family:'JetBrains Mono',monospace;font-size:11px;color:#ff7070;}
+.dot{width:7px;height:7px;border-radius:50%;background:#ff5757;
+  animation:pu 1.4s ease-in-out infinite;}
+@keyframes pu{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* ── Fortschrittsleiste ── */
+.prog{padding:12px 20px;background:var(--surf);border-bottom:1px solid var(--brd);}
+.steps{display:flex;align-items:center;}
+.sw{display:flex;align-items:center;gap:7px;}
+.sc{width:26px;height:26px;border-radius:50%;border:2px solid var(--brd2);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;
+  color:var(--mut);flex-shrink:0;transition:all .4s;}
+.sc.active{border-color:var(--acc);color:var(--acc);background:#f5a62312;}
+.sc.done{border-color:var(--grn);background:var(--grn);color:#000;}
+.sl{font-size:12px;color:var(--mut);transition:color .4s;white-space:nowrap;}
+.sl.active{color:var(--txt);}
+.sline{flex:1;height:2px;background:var(--brd);border-radius:1px;
+  min-width:20px;margin:0 8px;transition:background .4s;}
+.sline.done{background:var(--grn);}
+
+/* ── Main ── */
+main{max-width:740px;margin:0 auto;padding:24px 20px;}
+.phase{display:none;}.phase.active{display:block;animation:fi .3s ease;}
+@keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── Frau Kugl Sprechblase ── */
+.kugl-wrap{display:flex;align-items:flex-start;gap:14px;margin-bottom:18px;}
+.kugl-avatar{
+  flex-shrink:0;width:52px;height:52px;border-radius:50%;
+  background:linear-gradient(135deg,var(--school),var(--acc));
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;border:3px solid var(--acc);
+  box-shadow:0 0 0 4px #f5a62318;
+}
+.kugl-bubble{
+  background:linear-gradient(135deg,var(--school) 0%,#1e3a7a 100%);
+  border:1px solid #2e4a8a;border-radius:0 14px 14px 14px;
+  padding:14px 16px;flex:1;position:relative;
+}
+.kugl-bubble::before{
+  content:'';position:absolute;top:10px;left:-10px;
+  border:5px solid transparent;border-right-color:#1a3a6b;
+}
+.kugl-name{font-family:'Nunito',sans-serif;font-weight:800;font-size:12px;
+  color:var(--acc);letter-spacing:.5px;margin-bottom:5px;}
+.kugl-text{font-size:13px;color:#c8d8f0;line-height:1.75;}
+.kugl-text strong{color:#fff;}
+
+/* ── Card ── */
+.card{background:var(--card);border:1px solid var(--brd);
+  border-radius:12px;overflow:hidden;margin-bottom:16px;}
+.ch{padding:14px 18px;border-bottom:1px solid var(--brd);
+  display:flex;align-items:center;gap:10px;}
+.ci{width:34px;height:34px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;}
+.ch h2{font-size:14px;font-weight:600;}
+.ch p{font-size:12px;color:var(--mut);margin-top:2px;}
+.cb{padding:18px;}
+
+/* ── Aufgaben-Box ── */
+.aufgabe{background:#f5a6230d;border:1px solid #f5a62330;border-radius:10px;
+  padding:14px 16px;margin-bottom:16px;font-size:13px;color:#d4b870;line-height:1.75;}
+.aufgabe-label{color:var(--acc);display:block;margin-bottom:5px;font-size:10px;
+  letter-spacing:1.5px;text-transform:uppercase;
+  font-family:'JetBrains Mono',monospace;font-weight:700;}
+
+/* ── Inputs ── */
+.ig{margin-top:14px;}
+.il{font-size:12px;color:var(--mut);font-family:'JetBrains Mono',monospace;
+  margin-bottom:7px;display:block;}
+.ir{display:flex;gap:8px;}
+.ti{background:var(--bg);border:1.5px solid var(--brd2);border-radius:8px;
+  padding:10px 14px;color:var(--txt);font-family:'JetBrains Mono',monospace;
+  font-size:13px;flex:1;outline:none;transition:border-color .2s;min-width:0;}
+.ti:focus{border-color:var(--acc);}
+.ti.ok{border-color:var(--grn);background:#3ddc8406;}
+.ti.err{border-color:var(--red);animation:sk .3s;}
+@keyframes sk{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.btn{background:var(--acc);border:none;border-radius:8px;padding:10px 20px;
+  color:#000;font-family:'JetBrains Mono',monospace;font-size:12px;
+  font-weight:700;cursor:pointer;letter-spacing:.5px;
+  transition:all .15s;white-space:nowrap;}
+.btn:hover{background:#e09510;transform:translateY(-1px);}
+.btn-w{width:100%;margin-top:10px;padding:12px;}
+.fb{font-size:12px;margin-top:8px;min-height:18px;
+  font-family:'JetBrains Mono',monospace;}
+.fb.ok{color:var(--grn);}.fb.err{color:var(--red);}
+
+/* ── Hinweis ── */
+.hw{margin-top:12px;}
+.hbtn{background:none;border:1px solid var(--brd2);border-radius:8px;
+  padding:7px 13px;color:var(--mut);font-family:'JetBrains Mono',monospace;
+  font-size:11px;cursor:pointer;transition:all .2s;
+  display:inline-flex;align-items:center;gap:6px;}
+.hbtn:hover{border-color:var(--amb);color:var(--amb);}
+.hc{display:none;margin-top:8px;background:#ffb34710;
+  border:1px solid #ffb34730;border-radius:8px;padding:12px 14px;
+  font-size:12px;color:#c9a06a;line-height:1.75;}
+.hc.open{display:block;animation:fi .2s ease;}
+
+/* ── Teilcode-Reveal ── */
+.reveal{display:none;background:linear-gradient(135deg,#f5a6230a,#1a3a6b10);
+  border:1.5px solid var(--acc);border-radius:12px;
+  padding:24px;text-align:center;margin-top:16px;}
+.reveal.show{display:block;animation:fi .5s ease;}
+.rl{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--acc);
+  letter-spacing:3px;margin-bottom:10px;opacity:.8;}
+.rc{font-family:'JetBrains Mono',monospace;font-size:44px;font-weight:700;
+  color:var(--acc);letter-spacing:8px;text-shadow:0 0 20px #f5a62340;}
+.rn{font-size:12px;color:var(--mut);margin-top:8px;}
+
+/* ── Util ── */
+.tag{display:inline-block;background:var(--brd);border-radius:4px;
+  padding:1px 6px;font-family:'JetBrains Mono',monospace;font-size:12px;}
+
+/* ══ INTRO OVERLAY ══════════════════════════════════════════════════════ */
+#intro-overlay{
+  position:fixed;inset:0;z-index:9999;
+  display:flex;align-items:center;justify-content:center;
+  background:#000;overflow:hidden;
+}
+/* Phase A: Frau Kugl */
+#intro-kugl{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;padding:32px 24px;
+  background:linear-gradient(160deg,#0b1929 0%,#060e1c 100%);
+}
+.ik-logo{font-family:'JetBrains Mono',monospace;font-size:11px;color:#4f9eff;
+  letter-spacing:3px;margin-bottom:24px;opacity:.7;}
+.ik-avatar{width:90px;height:90px;border-radius:50%;
+  background:linear-gradient(135deg,#1a3560,#0d2040);
+  border:3px solid #4f9eff55;display:flex;align-items:center;
+  justify-content:center;font-size:40px;margin-bottom:14px;
+  box-shadow:0 0 40px #4f9eff18;}
+.ik-name{font-family:'JetBrains Mono',monospace;font-size:13px;
+  color:#4f9eff;letter-spacing:2px;margin-bottom:3px;font-weight:700;}
+.ik-role{font-size:12px;color:#2a4a6a;margin-bottom:26px;}
+.ik-bubble{background:#0e1e35;border:1px solid #1a3558;border-radius:14px;
+  border-top-left-radius:4px;padding:18px 22px;max-width:520px;
+  font-size:14px;color:#c8ddf0;line-height:1.85;margin-bottom:26px;
+  position:relative;text-align:left;}
+.ik-bubble::before{content:'';position:absolute;top:-1px;left:-1px;
+  width:14px;height:14px;background:#0e1e35;
+  border-left:1px solid #1a3558;border-top:1px solid #1a3558;
+  border-radius:0 0 8px 0;}
+.ik-startbtn{background:#4f9eff;border:none;border-radius:10px;
+  padding:13px 34px;color:#fff;font-family:'JetBrains Mono',monospace;
+  font-size:13px;font-weight:700;cursor:pointer;letter-spacing:1px;
+  transition:all .2s;}
+.ik-startbtn:hover{background:#3d8ef0;transform:translateY(-1px);}
+
+/* Phase B: G4TEWAY */
+#intro-hack{
+  position:absolute;inset:0;display:none;flex-direction:column;
+  align-items:center;justify-content:center;padding:24px;
+  background:#000;overflow:hidden;
+}
+#hcv{position:absolute;inset:0;pointer-events:none;}
+.ih-inner{position:relative;z-index:2;text-align:center;
+  animation:ghk .45s ease;}
+@keyframes ghk{
+  0%{opacity:0;transform:skewX(-10deg) scale(1.05)}
+  40%{opacity:1;transform:skewX(4deg)}
+  70%{transform:skewX(-1deg)}
+  100%{transform:skewX(0) scale(1)}
+}
+.ih-blink{font-family:'JetBrains Mono',monospace;font-size:11px;
+  color:#ff5757;letter-spacing:4px;margin-bottom:12px;
+  animation:ibl .85s step-end infinite;}
+@keyframes ibl{0%,100%{opacity:1}50%{opacity:0}}
+.ih-title{font-family:'JetBrains Mono',monospace;
+  font-size:clamp(40px,8vw,68px);font-weight:700;color:#ff5757;
+  letter-spacing:4px;line-height:1;margin-bottom:6px;
+  text-shadow:0 0 40px #ff575766;}
+.ih-sub{font-family:'JetBrains Mono',monospace;font-size:12px;
+  color:#aa3333;letter-spacing:2px;margin-bottom:22px;}
+.ih-msg{background:#120000;border:1px solid #ff575730;border-radius:10px;
+  padding:16px 22px;max-width:520px;font-size:13px;color:#ff9999;
+  line-height:1.85;margin-bottom:26px;font-family:'JetBrains Mono',monospace;
+  text-align:left;}
+.ih-msg strong{color:#ff5757;display:block;font-size:10px;
+  letter-spacing:2px;margin-bottom:8px;}
+.ih-btn{background:transparent;border:2px solid #ff5757;border-radius:10px;
+  padding:13px 34px;color:#ff5757;font-family:'JetBrains Mono',monospace;
+  font-size:13px;font-weight:700;cursor:pointer;letter-spacing:1px;
+  transition:all .2s;}
+.ih-btn:hover{background:#ff5757;color:#000;}
+/* ══ END INTRO ══════════════════════════════════════════════════════════ */
+</style>
+</head>
+<body>
+
+<div id="intro-overlay">
+  <div id="intro-kugl">
+    <div class="ik-logo">MS2 SCHWAZ // OPERATION SCHILD // TERMINAL 05</div>
+    <div class="ik-avatar">👩‍🏫</div>
+    <div class="ik-name">FRAU KUGL</div>
+    <div class="ik-role">Lehrerin · MS2 Schwaz</div>
+    <div class="ik-bubble">Hallo! Ich bin <strong>Frau Kugl</strong> von der MS2 Schwaz.<br><br>
+Heute tauchen wir ein in die <strong>Netzwerksicherheit</strong>.
+IP-Adressen, MAC-Adressen, Verschlüsselungsstandards —
+das ist das Fundament jedes sicheren WLANs.<br><br>
+Wir schauen uns an, wie Hacker gefälschte WLAN-Netzwerke aufbauen,
+wie IP-Adressen im Hexadezimalsystem gespeichert werden
+und wie Datenpakete aussehen.<br><br>
+<strong style="color:#6fb8ff;">Verbindet euch nie mit einem unbekannten WLAN! 📡</strong></div>
+    <button class="ik-startbtn" onclick="startHack()">▶ Aufgabe starten</button>
+  </div>
+  <div id="intro-hack">
+    <canvas id="hcv"></canvas>
+    <div class="ih-inner">
+      <div class="ih-blink">⚠ SYSTEM ÜBERNOMMEN ⚠</div>
+      <div class="ih-title">G4TEWAY</div>
+      <div class="ih-sub">MS2 SCHWAZ — TERMINAL 05</div>
+      <div class="ih-msg"><strong>// NACHRICHT AN DIE KLASSE //</strong>Ich habe im Netzwerk der MS2 Schwaz einen Doppelgänger platziert.<br>
+Zwei Netzwerke — gleicher Name — aber nur eines gehört der Schule.<br><br>
+Findet zuerst meine IP-Adresse aus dem Hex-Log.
+Dann erkennt, welches WLAN echt ist.
+Und lest, was ich in meinem Datenpaket versteckt habe.<br><br>
+Die Bytes reden. Hört ihr zu?</div>
+      <button class="ih-btn" onclick="closeIntro()">[ AUFGABE STARTEN ]</button>
+    </div>
+  </div>
+</div>
+<div class="schulheader">
+  <div class="schul-left">
+    <div class="schul-logo">MS2</div>
+    <div>
+      <div class="schul-name">Mittelschule 2 Schwaz</div>
+      <div class="schul-sub">Operation Schild · Cybersicherheit</div>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+    <div class="badge" style="background:#4f9eff22;border:1px solid #4f9eff55;color:#4f9eff;">TERMINAL 05</div>
+    <div class="title" style="font-weight:700;font-size:15px;color:#fff;">Netzwerksicherheit</div>
+    <div class="status"><div class="dot"></div>NETZWERK KOMPROMITTIERT</div>
+  </div>
+</div>
+<div class="prog"><div class="steps"><div class="sw"><div class="sc active" id="sc0">1</div><div class="sl active" id="sl0">Hex-IP umrechnen</div></div><div class="sline" id="ln0"></div><div class="sw"><div class="sc" id="sc1">2</div><div class="sl" id="sl1">Evil Twin erkennen</div></div><div class="sline" id="ln1"></div><div class="sw"><div class="sc" id="sc2">3</div><div class="sl" id="sl2">Paket-Nutzlast lesen</div></div></div></div>
+<main><div class="phase active" id="ph1">
+<div class="kugl-wrap">
+  <div class="kugl-avatar">👩‍🏫</div>
+  <div class="kugl-bubble">
+    <div class="kugl-name">FR. KUGL — MS2 SCHWAZ</div>
+    <div class="kugl-text">Terminal 05 — Netzwerksicherheit! <strong>G4TEWAY ist über das Schulnetzwerk eingedrungen.</strong> Im Netzwerk-Log findet ihr seine IP-Adresse — aber sie ist im Hexadezimalsystem (Basis 16) geschrieben. Rechnet sie in eine normale IP-Adresse um!</div>
+  </div>
+</div>
+<div class="card">
+  <div class="ch"><div class="ci" style="background:#4f9eff15;">📡</div><div><h2>Hex-IP-Adresse umrechnen</h2><p>Das verdächtige Gerät hat eine hexadezimale IP-Adresse im Log hinterlassen.</p></div></div>
+  <div class="cb">
+    <div class="aufgabe"><span class="aufgabe-label">Aufgabe — Schritt 1 von 3</span>
+      Rechnet jedes Hex-Byte in eine Dezimalzahl um. Formel: <strong>erste Ziffer × 16 + zweite Ziffer</strong>. Die vier Ergebnisse ergeben die IP-Adresse.
+    </div>
+    <div style="background:var(--bg);border:1px solid var(--brd);border-radius:10px;padding:16px;margin-bottom:14px;">
+      <div style="font-size:10px;color:var(--mut);font-family:'JetBrains Mono',monospace;letter-spacing:1px;margin-bottom:12px;">HEX → DEZIMAL UMRECHNER</div>
+      <div style="font-size:12px;color:var(--mut);font-family:'JetBrains Mono',monospace;margin-bottom:12px;line-height:1.8;">Hex-Ziffern: 0–9 normal, A=10, B=11, C=12, D=13, E=14, F=15<br>Beispiel: 1A = 1×16+10 = <span style="color:var(--grn);">26</span></div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 12px;background:var(--surf);border-radius:8px;flex-wrap:wrap;"><span style="font-family:'JetBrains Mono',monospace;font-size:16px;color:var(--amb);min-width:36px;">B9</span><span style="color:var(--mut);font-size:12px;flex:1;">= B(11) × 16 + 9 = ?</span></div>
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 12px;background:var(--surf);border-radius:8px;flex-wrap:wrap;"><span style="font-family:'JetBrains Mono',monospace;font-size:16px;color:var(--amb);min-width:36px;">DC</span><span style="color:var(--mut);font-size:12px;flex:1;">= D(13) × 16 + C(12) = ?</span></div>
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 12px;background:var(--surf);border-radius:8px;flex-wrap:wrap;"><span style="font-family:'JetBrains Mono',monospace;font-size:16px;color:var(--amb);min-width:36px;">65</span><span style="color:var(--mut);font-size:12px;flex:1;">= 6 × 16 + 5 = ?</span></div>
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 12px;background:var(--surf);border-radius:8px;flex-wrap:wrap;"><span style="font-family:'JetBrains Mono',monospace;font-size:16px;color:var(--amb);min-width:36px;">2F</span><span style="color:var(--mut);font-size:12px;flex:1;">= 2 × 16 + F(15) = ?</span></div>
+      </div>
+    </div>
+    <div class="ig"><label class="il">Vollständige IP-Adresse (Format: xxx.xxx.xxx.xx):</label>
+      <div class="ir"><input class="ti" id="p1i" placeholder="???.???.???.??" autocomplete="off" autocorrect="off" spellcheck="false"><button class="btn" onclick="chk1()">PRÜFEN</button></div>
+      <div class="fb" id="fb1"></div>
+    </div>
+    <div class="hw"><button class="hbtn" onclick="th('h1')">💡 Hinweis anzeigen</button>
+    <div class="hc" id="h1">B9: B=11, 11×16=176, 176+9=185. DC: D=13, C=12, 13×16=208, 208+12=220. Dann 65 und 2F genauso berechnen.</div></div>
+  </div>
+</div>
+</div>
+
+<div class="phase" id="ph2">
+<div class="kugl-wrap">
+  <div class="kugl-avatar">👩‍🏫</div>
+  <div class="kugl-bubble">
+    <div class="kugl-name">FR. KUGL — MS2 SCHWAZ</div>
+    <div class="kugl-text">Sehr gut! Jetzt kommt ein besonders gefährlicher Angriff: der <strong>Evil Twin</strong>. G4TEWAY hat ein gefälschtes WLAN-Netz mit dem Namen der Schule erstellt. Schüler, die sich damit verbinden, schicken all ihre Daten direkt an den Hacker! Findet das echte Schulnetzwerk.</div>
+  </div>
+</div>
+<div class="card">
+  <div class="ch"><div class="ci" style="background:#ff575715;">📶</div><div><h2>Evil-Twin-Netzwerk identifizieren</h2><p>G4TEWAY hat einen gefälschten WLAN-Hotspot erstellt.</p></div></div>
+  <div class="cb">
+    <div class="aufgabe"><span class="aufgabe-label">Aufgabe — Schritt 2 von 3</span>
+      Findet das echte MS2-Schulnetzwerk anhand von MAC-Präfix, IP-Bereich und Verschlüsselung.
+    </div>
+    <div style="background:#4f9eff0d;border:1px solid #4f9eff25;border-radius:8px;padding:12px 14px;margin-bottom:14px;font-size:12px;color:#8ab4d8;line-height:1.8;">
+      Echter Router: MAC-Präfix <span style="font-family:'JetBrains Mono',monospace;color:var(--grn);">00:1A:2B</span> · IP-Bereich <span style="font-family:'JetBrains Mono',monospace;color:var(--grn);">10.0.x.x</span> · Verschlüsselung: <span style="font-family:'JetBrains Mono',monospace;color:var(--grn);">WPA3</span>
+    </div>
+    <div style="overflow-x:auto;">
+      <table style="width:100%;border-collapse:collapse;font-size:12px;">
+        <thead><tr style="background:var(--surf);"><th style="padding:9px 10px;text-align:left;border-bottom:1px solid var(--brd);color:var(--mut);font-size:10px;font-family:'JetBrains Mono',monospace;font-weight:500;">NETZWERKNAME</th><th style="padding:9px 10px;text-align:left;border-bottom:1px solid var(--brd);color:var(--mut);font-size:10px;font-family:'JetBrains Mono',monospace;font-weight:500;">MAC-ADRESSE</th><th style="padding:9px 10px;text-align:left;border-bottom:1px solid var(--brd);color:var(--mut);font-size:10px;font-family:'JetBrains Mono',monospace;font-weight:500;">GATEWAY-IP</th><th style="padding:9px 10px;text-align:left;border-bottom:1px solid var(--brd);color:var(--mut);font-size:10px;font-family:'JetBrains Mono',monospace;font-weight:500;">VERSCHL.</th></tr></thead>
+        <tbody>
+          <tr id="wr0" onclick="pickW(0)" style="cursor:pointer;transition:background .2s;"><td style="padding:9px 10px;border-bottom:1px solid var(--brd);font-family:'JetBrains Mono',monospace;">MS2-Schwaz-WLAN</td><td style="padding:9px 10px;border-bottom:1px solid var(--brd);font-family:'JetBrains Mono',monospace;color:var(--red);">B9:DC:65:2F:AA:11</td><td style="padding:9px 10px;border-bottom:1px solid var(--brd);font-family:'JetBrains Mono',monospace;color:var(--red);">185.220.101.47</td><td style="padding:9px 10px;border-bottom:1px solid var(--brd);font-family:'JetBrains Mono',monospace;color:var(--amb);">WPA2</td></tr>
+          <tr id="wr1" onclick="pickW(1)" style="cursor:pointer;transition:background .2s;"><td style="padding:9px 10px;border-bottom:1px solid var(--brd);font-family:'JetBrains Mono',monospace;">MS2-Schwaz-WLAN</td><td style="padding:9px 10px;border-bottom:1px solid var(--brd);font-family:'JetBrains Mono',monospace;color:var(--grn);">00:1A:2B:CC:44:88</td><td style="padding:9px 10px;border-bottom:1px solid var(--brd);font-family:'JetBrains Mono',monospace;color:var(--grn);">10.0.1.1</td><td style="padding:9px 10px;border-bottom:1px solid var(--brd);font-family:'JetBrains Mono',monospace;color:var(--grn);">WPA3</td></tr>
+          <tr id="wr2" onclick="pickW(2)" style="cursor:pointer;transition:background .2s;"><td style="padding:9px 10px;border-bottom:1px solid var(--brd);font-family:'JetBrains Mono',monospace;color:var(--amb);">FREIES-WLAN-SCHWAZ</td><td style="padding:9px 10px;border-bottom:1px solid var(--brd);font-family:'JetBrains Mono',monospace;color:var(--red);">FF:EE:DD:CC:BB:AA</td><td style="padding:9px 10px;border-bottom:1px solid var(--brd);font-family:'JetBrains Mono',monospace;color:var(--amb);">192.168.1.1</td><td style="padding:9px 10px;border-bottom:1px solid var(--brd);font-family:'JetBrains Mono',monospace;color:var(--red);">OFFEN</td></tr>
+          <tr id="wr3" onclick="pickW(3)" style="cursor:pointer;transition:background .2s;"><td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;color:var(--mut);">iPhone_Hotspot</td><td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;color:var(--amb);">7E:A4:B3:12:CC:90</td><td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;color:var(--amb);">172.20.10.1</td><td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;color:var(--amb);">WPA2</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="fb" id="fb2" style="margin-top:10px;"></div>
+    <div class="hw"><button class="hbtn" onclick="th('h2')">💡 Hinweis anzeigen</button>
+    <div class="hc" id="h2">Prüfe alle drei Kriterien: MAC beginnt mit 00:1A:2B? IP im Bereich 10.0.x.x? Verschlüsselung WPA3? Nur eines erfüllt alle drei.</div></div>
+  </div>
+</div>
+</div>
+
+<div class="phase" id="ph3">
+<div class="kugl-wrap">
+  <div class="kugl-avatar">👩‍🏫</div>
+  <div class="kugl-bubble">
+    <div class="kugl-name">FR. KUGL — MS2 SCHWAZ</div>
+    <div class="kugl-text">Letzter Schritt! G4TEWAY hat eine verschlüsselte Nachricht in einem Datenpaket versteckt. Das Paket nutzt ASCII-Hex — jedes Hex-Paar steht für einen Buchstaben. Rechnet die markierten Bytes um und findet das versteckte Wort!</div>
+  </div>
+</div>
+<div class="card">
+  <div class="ch"><div class="ci" style="background:#a78bfa15;">📦</div><div><h2>Datenpaket-Nutzlast lesen</h2><p>Ein verdächtiges Paket wurde im Schulnetzwerk abgefangen.</p></div></div>
+  <div class="cb">
+    <div class="aufgabe"><span class="aufgabe-label">Aufgabe — Schritt 3 von 3</span>
+      Rechnet die markierten Bytes (Hex → Dezimal → ASCII) um und findet das versteckte Wort. Das ist euer Teilcode.
+    </div>
+    <div style="background:var(--bg);border:1px solid var(--brd);border-radius:8px;font-family:'JetBrains Mono',monospace;font-size:12px;overflow:hidden;margin-bottom:14px;">
+      <div style="padding:9px 14px;border-bottom:1px solid var(--brd);font-size:10px;color:var(--mut);letter-spacing:1px;">ABGEFANGENES PAKET #0x3A7 — NUTZLAST</div>
+      <div style="padding:14px;line-height:2.3;word-break:break-all;">
+        <div><span style="color:var(--mut);">0000 </span><span style="color:#2a4a6a;">45 00 00 3c 1a 2b 40 00 40 06 00 00 0a 00 01 05</span></div>
+        <div><span style="color:var(--mut);">0010 </span><span style="color:#2a4a6a;">0a 00 01 01 c7 f4 00 50 </span><span style="color:var(--amb);font-weight:700;">56 45 4e 4f 4d</span><span style="color:#2a4a6a;"> 3a 20 47</span></div>
+        <div><span style="color:var(--mut);">0020 </span><span style="color:#2a4a6a;">34 54 45 57 41 59 00 00 00 00 00 00 00 00 00 00</span></div>
+      </div>
+    </div>
+    <div style="background:#ffb3470d;border:1px solid #ffb34730;border-radius:8px;padding:12px 14px;margin-bottom:14px;font-size:12px;color:#c9a06a;line-height:1.8;">
+      Markierte Bytes: <span style="font-family:'JetBrains Mono',monospace;color:var(--amb);">56 45 4e 4f 4d</span><br>
+      Hilfe: 56=86=?, 45=69=?, 4e=78=?, 4f=79=?, 4d=77=? (A=65, B=66, …, V=86, …)
+    </div>
+    <div class="ig"><label class="il">Welches Wort ergeben die markierten Bytes?</label>
+      <div class="ir"><input class="ti" id="p3i" placeholder="?????" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" oninput="this.value=this.value.toUpperCase()"><button class="btn" onclick="chk3()">PRÜFEN</button></div>
+      <div class="fb" id="fb3"></div>
+    </div>
+    <div class="hw"><button class="hbtn" onclick="th('h3')">💡 Hinweis anzeigen</button>
+    <div class="hc" id="h3">Jedes Hex-Paar → Dezimal → ASCII-Buchstabe. V=86=0x56, E=69=0x45, N=78=0x4E, O=79=0x4F, M=77=0x4D.</div></div>
+  </div>
+</div>
+<div class="reveal" id="rev">
+  <div class="rl">TERMINAL 05 — TEILCODE FREIGESCHALTET</div>
+  <div class="rc">VENOM</div>
+  <div class="rn">Notiere diesen Code sorgfältig. Du brauchst ihn am Ende beim Final-Terminal.</div>
+</div>
+</div>
+</main>
+<script>
+function th(id){document.getElementById(id).classList.toggle('open');}
+function setErr(ii,fi,m){
+  var f=document.getElementById(fi);f.className='fb err';f.textContent=m;
+  var i=document.getElementById(ii);i.className='ti err';
+  setTimeout(function(){i.className='ti';},500);
+}
+function advance(n,total){
+  var s=document.getElementById('sc'+n);s.className='sc done';s.textContent='✓';
+  if(n<total-1){
+    document.getElementById('ln'+n).className='sline done';
+    document.getElementById('sc'+(n+1)).className='sc active';
+    document.getElementById('sl'+(n+1)).className='sl active';
+  }
+}
+function nextPhase(from,total){
+  advance(from,total);
+  setTimeout(function(){
+    document.getElementById('ph'+(from+1)).classList.remove('active');
+    document.getElementById('ph'+(from+2)).classList.add('active');
+    window.scrollTo({top:0,behavior:'smooth'});
+  },1400);
+}
+
+function chk1(){var v=document.getElementById('p1i').value.trim().replace(/\s/g,'');if(v==='185.220.101.47'){var f=document.getElementById('fb1');f.className='fb ok';f.textContent='✓ Richtig! B9=185, DC=220, 65=101, 2F=47 → 185.220.101.47';document.getElementById('p1i').className='ti ok';nextPhase(0,3);}else{setErr('p1i','fb1','✗ B9 → 11×16+9=185. DC → 13×16+12=220. Dann 65 und 2F.');}}
+function pickW(n){for(var i=0;i<4;i++)document.getElementById('wr'+i).style.background='';if(n===1){document.getElementById('wr1').style.background='#3ddc8408';var f=document.getElementById('fb2');f.className='fb ok';f.textContent='✓ Richtig! MAC 00:1A:2B = echter Router, IP 10.0.1.1 = internes Netz, WPA3 = stärkste Verschlüsselung. Das andere MS2-Schwaz-WLAN ist G4TEWAYs Evil Twin!';nextPhase(1,3);}else{document.getElementById('wr'+n).style.background='#ff575708';var msgs=['Gleicher Name, aber MAC ist die Angreifer-IP von Schritt 1! Evil Twin.','','Kein Passwort — offensichtliche Falle.','Privater Hotspot.'];document.getElementById('fb2').className='fb err';document.getElementById('fb2').textContent='✗ '+(msgs[n]||'')+' Vergleiche MAC, IP und Verschlüsselung mit den grünen Kriterien.';}}
+function chk3(){var v=document.getElementById('p3i').value.trim().toUpperCase();if(v==='VENOM'){var f=document.getElementById('fb3');f.className='fb ok';f.textContent='✓ Richtig! 56=86=V, 45=69=E, 4E=78=N, 4F=79=O, 4D=77=M → VENOM';document.getElementById('p3i').className='ti ok';advance(2,3);setTimeout(function(){document.getElementById('rev').classList.add('show');},600);}else{setErr('p3i','fb3','✗ Hex → Dezimal → ASCII. V=86, E=69, N=78, O=79, M=77.');}}
+
+/* ── INTRO LOGIC ─────────────────────────────────────────────── */
+(function(){
+  var hcv=null,hctx=null,hdrops=[];
+  function initRain(){
+    hcv=document.getElementById('hcv');
+    if(!hcv)return;
+    hcv.width=window.innerWidth;hcv.height=window.innerHeight;
+    hctx=hcv.getContext('2d');
+    hdrops=[];
+    for(var i=0;i<Math.floor(hcv.width/14);i++)hdrops.push(Math.random()*50);
+    setInterval(rain,55);
+  }
+  function rain(){
+    if(!hctx)return;
+    hctx.fillStyle='rgba(0,0,0,.07)';hctx.fillRect(0,0,hcv.width,hcv.height);
+    hctx.fillStyle='#cc2200';hctx.font='12px monospace';
+    var ch='01G4TEWAYMS2!@#';
+    hdrops.forEach(function(y,i){
+      hctx.fillText(ch[Math.floor(Math.random()*ch.length)],i*14,y*14);
+      if(y*14>hcv.height&&Math.random()>.96)hdrops[i]=0;
+      hdrops[i]++;
+    });
+  }
+  window.startHack=function(){
+    var kugl=document.getElementById('intro-kugl');
+    var hack=document.getElementById('intro-hack');
+    var n=0;
+    var iv=setInterval(function(){
+      kugl.style.opacity=(n%2===0)?'0':'1';
+      n++;
+      if(n>9){
+        clearInterval(iv);
+        kugl.style.display='none';
+        hack.style.display='flex';
+        initRain();
+      }
+    },80);
+  };
+  window.closeIntro=function(){
+    var ov=document.getElementById('intro-overlay');
+    ov.style.transition='opacity .5s';
+    ov.style.opacity='0';
+    setTimeout(function(){ov.style.display='none';},520);
+  };
+})();
+/* ── END INTRO LOGIC ─────────────────────────────────────────── */
+</script>
+</body>
+</html>
